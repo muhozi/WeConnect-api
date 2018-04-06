@@ -1,9 +1,9 @@
 # WeConnect 
-[![Build Status](https://travis-ci.org/muhozi/WeConnect.svg?branch=master)](https://travis-ci.org/muhozi/WeConnect)
-[![Coverage Status](https://coveralls.io/repos/github/muhozi/WeConnect/badge.svg)](https://coveralls.io/github/muhozi/WeConnect)
-[![codecov](https://codecov.io/gh/muhozi/WeConnect/branch/master/graph/badge.svg)](https://codecov.io/gh/muhozi/WeConnect)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/430f61e8095c42978b9461b03b7570ae)](https://www.codacy.com/app/muhozi/WeConnect?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=muhozi/WeConnect&amp;utm_campaign=Badge_Grade)
-[![Maintainability](https://api.codeclimate.com/v1/badges/4fed0cd96ad48633a616/maintainability)](https://codeclimate.com/github/muhozi/WeConnect/maintainability)
+[![Build Status](https://travis-ci.org/muhozi/WeConnect-2.svg?branch=master)](https://travis-ci.org/muhozi/WeConnect-2)
+[![Coverage Status](https://coveralls.io/repos/github/muhozi/WeConnect-2/badge.svg)](https://coveralls.io/github/muhozi/WeConnect-2)
+[![codecov](https://codecov.io/gh/muhozi/WeConnect-2/branch/master/graph/badge.svg)](https://codecov.io/gh/muhozi/WeConnect-2)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/430f61e8095c42978b9461b03b7570ae)](https://www.codacy.com/app/muhozi/WeConnect-2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=muhozi/WeConnect-2&amp;utm_campaign=Badge_Grade)
+[![Maintainability](https://api.codeclimate.com/v1/badges/4fed0cd96ad48633a616/maintainability)](https://codeclimate.com/github/muhozi/WeConnect-2/maintainability)
 
 
 WeConnect provides a platform that brings businesses and individuals together. This platform creates awareness for businesses and gives the users the ability to write reviews about the businesses they have interacted with. 
@@ -23,7 +23,7 @@ This platform API is built on the top Flask python web framework.
 Clone the repository
 
 ```sh
-git clone git@github.com:muhozi/WeConnect.git
+git clone git@github.com:muhozi/WeConnect-2.git
 ```
 
 Create the virtual environment and install dependencies(These are required Python,pip and virtual environment):
