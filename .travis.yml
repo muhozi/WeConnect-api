@@ -1,19 +1,24 @@
 # Turn off email notifications
 notifications:
   email: false
+sudo: required
+dist: precise
+
+addons:
+    postgresql: "9.5"
+services:
+    - postgresql
 
 language: python
-dist: trusty
 python:
   - "3.6"
 
+before_script:
+  - psql -c 'create database weconnect_test;' -U postgres
+  
 # command to install dependencies
 install:
   - pip install -r requirements.txt
-
-# Additional services
-services:
-  - postgresql
 
 # Set config for testing on Travis
 env:
@@ -23,8 +28,7 @@ env:
     - PGPORT=5433
     - DATABASE_URI='postgresql://postgres@localhost:5433/weconnect'
 
-before_script:
-  - psql -c 'create database weconnect_test;' -U postgres
+
 
 # command to run tests.py
 script:
