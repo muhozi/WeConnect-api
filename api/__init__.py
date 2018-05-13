@@ -1,13 +1,21 @@
 """
-	 Initialize the app
+     Initialize the app
 """
 from flask import Flask
 from flasgger import Swagger
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from dotenv import load_dotenv
+from config import api_config
+
+db = SQLAlchemy()
+
 from api.api import API
-APP = Flask(__name__, instance_relative_config=True)
-APP.register_blueprint(API)
+
+
+# Swagger configurations
 SWAGGER_CONFIG = {
-    "headers":[],
+    "headers": [],
     "title": "WeConnect",
     "specs": [
         {
@@ -42,7 +50,12 @@ TEMPLATE = {
     ],
     "operationId": "getmyData"
 }
-
-SWAGGER = Swagger(APP, config=SWAGGER_CONFIG, template=TEMPLATE)
-
-APP.config.from_object('config')
+def create_app(config_name):
+    app = Flask(__name__, instance_relative_config=True)
+    # Register blueprint
+    app.register_blueprint(API)
+    # app.config.from_object(api_config[config_name])
+    app.config.from_object(api_config[config_name])
+    db.init_app(app)
+    SWAGGER = Swagger(app, config=SWAGGER_CONFIG, template=TEMPLATE)
+    return app

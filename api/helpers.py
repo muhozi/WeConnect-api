@@ -4,6 +4,7 @@
 from flask import current_app as app
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
+from hashids import Hashids
 
 
 def get_token(user_id, expires_in=3600, key=None):
@@ -29,3 +30,21 @@ def token_id(token):
     except BadSignature:
         return False  # invalid token
     return data['id']
+
+def hashid(id_string):
+    """
+        Generate hashid
+    """
+    hashid = Hashids(salt=app.config['SECRET_KEY'], min_length=34)
+    return hashid.encode(id_string)
+
+
+def get_id(id_string):
+    """
+        Get id from hashid
+    """
+    hashid = Hashids(salt=app.config['SECRET_KEY'], min_length=34)
+    f_id = hashid.decode(id_string)
+    if len(f_id) is not 0:
+        return f_id[0]
+    return None

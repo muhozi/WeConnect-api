@@ -3,6 +3,8 @@ Validations Methods Class
 """
 
 import re
+from api import db
+from api.models.user import User
 
 
 class Validations():
@@ -60,3 +62,13 @@ class Validations():
                 return key + " should not be empty"
             return True
         return key + " is required"
+
+    def unique(self, key, tableRow):
+        """Check if value is unique"""
+        model = tableRow.split(':')[0]
+        row = tableRow.split(':')[1]
+        if key in self.all:
+            if ((db.session.query((eval(model)).id).filter(getattr((eval(model)), row) == self.all[key]).scalar()) is not None):
+                return row+" has been taken"
+            return True
+        return True

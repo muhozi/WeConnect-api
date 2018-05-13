@@ -8,7 +8,7 @@ from flask import json
 from api.models.user import User
 from api.models.business import Business
 from api.helpers import get_token
-from tests.api_tests import MainTests
+from tests.test_api import MainTests
 
 
 class UserTests(MainTests):
@@ -18,26 +18,26 @@ class UserTests(MainTests):
             Testing registration
         '''
         response = self.app.post(self.url_prefix + 'auth/register', data=json.dumps({
-            'username': self.exist_user['username'],
-            'email': self.exist_user['email'],
-            'password': self.exist_user['password'],
-            'confirm_password': self.exist_user['confirm_password']
+            'username': 'testfdfdkjndf',
+            'email': 'test@tester.cd',
+            'password': '123456',
+            'confirm_password': '123456'
         }), content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertIn(b'have been successfully registered', response.data)
 
-    def test_exist_email(self):
+    def test_exist_email_username(self):
         '''
-            Testing registration with exist email
+            Testing registration with exist email and username
         '''
         response = self.app.post(self.url_prefix + 'auth/register', data=json.dumps({
-            'username': self.exist_user['username'],
+            'username': self.sample_user['username'],
             'email': self.sample_user['email'],
-            'password': self.exist_user['password'],
-            'confirm_password': self.exist_user['confirm_password']
+            'password': self.sample_user['password'],
+            'confirm_password': self.sample_user['confirm_password']
         }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
-        self.assertIn(b'Sorry the email address has been taken', response.data)
+        self.assertIn(b'email has been taken', response.data)
 
     def test_wrong_registration(self):
         """
@@ -58,6 +58,7 @@ class UserTests(MainTests):
             'email': self.sample_user['email'],
             'password': self.sample_user['password']
         }), content_type='application/json')
+        print(response)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'successfully logged', response.data)
 
@@ -77,7 +78,7 @@ class UserTests(MainTests):
             Testing for invalid credentials
         """
         response = self.app.post(self.url_prefix + 'auth/login', data=json.dumps({
-            'email': 'anyemail',
+            'email': 'anyemail@gmail',
             'password': 'anyinvalidpassword'
         }), content_type='application/json')
         self.assertEqual(response.status_code, 401)
@@ -108,7 +109,7 @@ class UserTests(MainTests):
         """
         response = self.app.post(self.url_prefix + 'auth/reset-password', data=json.dumps({
             'old_password': self.sample_user['password'],  # Old password
-            'new_password': '123456',
+            'new_password': '12345678',
         }), content_type='application/json',
             headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 201)
@@ -140,9 +141,9 @@ class UserTests(MainTests):
         self.assertIn(
             b'Please provide valid details', response.data)
 
-    def test_valid_token(self):
+    def test_invalid_token(self):
         """
-            Testing valid token
+            Testing invalid token
         """
         # Test invalid token by accessing protected endpoint with invalid
         # authorization token
@@ -174,7 +175,7 @@ class UserTests(MainTests):
             Testing Bad signature token
         """
         #Access protected endpoint with bad signature token
-        response = self.app.get(self.url_prefix + 'businesses',
+        response = self.app.get(self.url_prefix + 'account/businesses',
             headers={'Authorization': self.other_signature_token})
         self.assertEqual(response.status_code, 401)
         self.assertIn(
