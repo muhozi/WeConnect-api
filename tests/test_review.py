@@ -1,14 +1,10 @@
 """
     Main test
 """
-import datetime
-import uuid
 from flask import json
-from api.models.user import User
-from api.models.business import Business
-from api.models.review import Review
-from api.helpers import get_token
 from tests.test_api import MainTests
+from api.models.review import Review
+from api import db
 
 
 class ReviewTests(MainTests):
@@ -23,7 +19,8 @@ class ReviewTests(MainTests):
             Test adding business review
         '''
         self.add_business()
-        response = self.app.post(self.url_prefix + 'businesses/' + self.business_data['hashid'] + '/reviews',
+        response = self.app.post(self.url_prefix + 'businesses/' +
+                                 self.business_data['hashid'] + '/reviews',
                                  data=json.dumps({
                                      'review': 'We enjoy your coffee',
                                  }), headers={'Authorization': self.test_token})
@@ -31,7 +28,7 @@ class ReviewTests(MainTests):
         self.assertIn(
             b'Your review has been sent', response.data)
 
-    def test_add_review_to_invalid_business(self):
+    def test_add_invalid_business_rev(self):
         '''
             Test adding business review to business which doesn't exist
         '''
@@ -48,7 +45,8 @@ class ReviewTests(MainTests):
             Test adding business review to business which doesn't exist
         '''
         self.add_business()
-        response = self.app.post(self.url_prefix + 'businesses/' + self.business_data['hashid'] + '/reviews',
+        response = self.app.post(self.url_prefix + 'businesses/' +
+                                 self.business_data['hashid'] + '/reviews',
                                  data=json.dumps({
                                      'review': '',
                                  }), headers={'Authorization': self.test_token})
@@ -81,13 +79,27 @@ class ReviewTests(MainTests):
             Test retrieving business reviews
         '''
         self.add_business()
+        review = Review(
+            user_id=self.sample_user['id'],
+            business_id=self.business_data['id'],
+            description="Awesome! We love it",
+        )
+        db.session.add(review)
+        db.session.commit()
+        review2 = Review(
+            user_id=self.sample_user['id'],
+            business_id=self.business_data['id'],
+            description="I can't wait to come back",
+        )
+        db.session.add(review2)
+        db.session.commit()
         response = self.app.get(
             self.url_prefix + 'businesses/' + self.business_data['hashid'] + '/reviews')
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             b'reviews', response.data)
 
-    def test_add_review_to_invalid_business(self):
+    def test_add_rev_invalid_business(self):
         '''
             Test adding business review to business which doesn't exist
         '''
@@ -98,4 +110,3 @@ class ReviewTests(MainTests):
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'business doesn\'t exist', response.data)
-

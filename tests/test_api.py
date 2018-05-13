@@ -2,12 +2,9 @@
     Main tests
 """
 import unittest
-import json
-from api import create_app
-from flask import json
 from werkzeug.security import generate_password_hash
+from api import create_app
 from api.models.user import User
-from api.models.review import Review
 from api.models.token import Token
 from api.models.business import Business
 from api.helpers import get_token
@@ -50,17 +47,13 @@ class MainTests(unittest.TestCase):
             'country': 'Kenya',
             'city': 'Nairobi'
         }
-        # Save business for reviews testing
+        # Business sample data
         self.rev_business_data = {
             'name': 'KFC',
             'description': 'Finger lickin\' good',
             'country': 'Kenya',
             'city': 'Nairobi'
         }
-        # Add user(owner) to the business data dict
-        # self.rev_business_data['user_id'] = self.sample_user['id']
-        # Save business in the storage list for testing
-        # Business(self.rev_business_data)
         with self.main.test_request_context():
             # Orphan id: User id that will be used to create an orphan token
             orphan_user = User(
@@ -77,7 +70,7 @@ class MainTests(unittest.TestCase):
             db.session.add(orphan_user)
             db.session.commit()
             self.sample_user['id'] = user.id
-            self.orphan_id= orphan_user.id
+            self.orphan_id = orphan_user.id
             db.session.remove()
             token = Token(user_id=self.sample_user['id'], access_token=get_token(
                 self.sample_user['id']))
@@ -100,7 +93,7 @@ class MainTests(unittest.TestCase):
             db.session.add(token)
             db.session.add(orphan_token)
             db.session.add(expired_token)
-            db.session.add(expired_token)
+            db.session.add(other_signature_token)
             db.session.add(business)
             db.session.commit()
             self.test_token = token.access_token
@@ -109,6 +102,9 @@ class MainTests(unittest.TestCase):
             self.orphan_token = orphan_token.access_token
 
     def add_business(self):
+        """
+            Add sample business in database
+        """
         business = Business(
             user_id=self.sample_user['id'],
             name=self.business_data['name'],
@@ -119,7 +115,7 @@ class MainTests(unittest.TestCase):
         db.session.add(business)
         db.session.commit()
         self.business_data['hashid'] = business.hashid()
-
+        self.business_data['id'] = business.id
 
     def tearDown(self):
         with self.app_context:
