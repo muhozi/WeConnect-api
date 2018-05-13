@@ -20,11 +20,16 @@ env:
     - SECRET_KEY=96da21865b3e3774d7b2f0cb15cf5ee4f7c1ce09042745ca
     - DEBUG=True
     - PGPORT=5433
-    - DATABASE_URI='postgresql://test_user:databasepass@localhost:5433/weconnect'
+    - DATABASE_URI='postgresql://postgres@localhost:5433/weconnect'
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install language-pack-es
+  - sudo /etc/init.d/postgresql stop
+  - sudo /etc/init.d/postgresql start 9.3
 
 before_script:
-  - psql -c 'CREATE USER test_user WITH PASSWORD "databasepass";' -U postgres
-  - psql -c 'CREATE DATABASE weconnect_test owner test_user;'' -U postgres
+  - psql -c 'create database weconnect_test;' -U postgres
 
 # command to run tests.py
 script:
