@@ -326,8 +326,8 @@ def get_all_businesses():
         response.status_code = 200
         return response
     response = jsonify(
-        status='error', message="You don't have registered business")
-    response.status_code = 204
+        status='error', message="There is no registered business")
+    response.status_code = 200
     return response
 
 

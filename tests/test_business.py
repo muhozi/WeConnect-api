@@ -12,6 +12,19 @@ class BusinessTests(MainTests):
         Business tests class
     """
 
+    def test_empty_businesses(self):
+        '''
+            Test retrieving businesses with none registered
+        '''
+        business = Business.query.filter_by(id=1).first()
+        db.session.delete(business)
+        db.session.commit()
+        response = self.app.get(
+            self.url_prefix + 'businesses')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'no registered business', response.data)
+
     def test_business_registration(self):
         '''
             Testing business registration
@@ -200,7 +213,23 @@ class BusinessTests(MainTests):
         response = self.app.get(
             self.url_prefix + 'businesses')
         self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'registered businesses', response.data)
 
+
+    def test_empty_businesses(self):
+        '''
+            Test retrieving businesses with none registered
+        '''
+        business = Business.query.filter_by(id=1).first()
+        db.session.delete(business)
+        db.session.commit()
+        response = self.app.get(
+            self.url_prefix + 'businesses')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'no registered business', response.data)
+        
     def test_business(self):
         '''
             Test retrieving business details

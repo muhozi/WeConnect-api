@@ -33,7 +33,6 @@ class Business(db.Model):
         found_id = get_id(business_id)
         if found_id is not None:
             return cls.query.get(found_id)
-        return None
 
     @classmethod
     def serializer(cls, datum):
@@ -60,7 +59,6 @@ class Business(db.Model):
         found_business_id = get_id(business_id)
         if get_id(business_id) is not None:
             return cls.query.filter_by(user_id=user_id, id=found_business_id).first()
-        return None
 
     @classmethod
     def serialize_obj(cls, data):
@@ -81,7 +79,6 @@ class Business(db.Model):
         businesses = cls.query.filter_by(user_id=user_id).all()
         if businesses is not None:
             return businesses
-        return None
 
     @classmethod
     def has_two_same_business(cls, user_id, business_name, business_id):
