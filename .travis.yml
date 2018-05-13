@@ -3,9 +3,10 @@ notifications:
   email: false
 sudo: required
 dist: precise
-
+sudo: required
 addons:
     postgresql: "9.5"
+    
 services:
     - postgresql
 
@@ -15,7 +16,7 @@ python:
 
 before_script:
   - psql -c 'create database weconnect_test;' -U postgres
-  
+
 # command to install dependencies
 install:
   - pip install -r requirements.txt
