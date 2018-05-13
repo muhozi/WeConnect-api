@@ -16,6 +16,11 @@ WeConnect provides a platform that brings businesses and individuals together. T
 
 **TL**;**DR** Check the API docs at https://allconnect.herokuapp.com/api/v1 
 
+### Prerequisites
+
+* Python > 3
+* PostgreSQL
+
 ### Set up the environment
 
 This platform API is built on the top Flask python web framework.
@@ -48,27 +53,36 @@ Install dependencies using pip
 pip install -r requirements.txt
 ```
 
-Add required environment variables:
+**Creating database**
+
+Create a database with any given name (for ex `weconnect`) and create database(testing database) with the same name with `_test` appended, as our example this would be `weconnect_test`.
+
+**Set required environment variables:**
 
 You may use `.env` configuration file (Loaded using [python-dotenv](https://github.com/theskumar/python-dotenv)):
 
 Create file name it `.env` and add the following contents:
 
-```con
+```sh
 DEBUG=True
 SECRET_KEY=any_chosen_secret_key
+DATABASE_URI='postgresql://db_user:db_password@127.0.0.1:5432/db_name'
 ```
 
 **OR**
 
 ***On windows(cmd)*:**
 
-```powershell
+```sh
 SET SECRET_KEY=any_chosen_secret_key
 ```
 
-```powershell
+```sh
 SET DEBUG=True
+```
+
+```sh
+SET DATABASE_URI='postgresql://db_user:db_password@127.0.0.1:5432/db_name'
 ```
 
 ***On Unix based system*:**
@@ -79,6 +93,10 @@ export SECRET_KEY=any_chosen_secret_key
 
 ```sh
 export DEBUG=True
+```
+
+```sh
+export DATABASE_URI='postgresql://db_user:db_password@127.0.0.1:5432/db_name'
 ```
 
 
@@ -115,6 +133,8 @@ View the API usage (Documentation) in a browser via: http://127.0.0.1:5000/api/v
 
 **`GET /api/v1/businesses/<business-id>`** *Get a business details*
 
+**`GET /api/v1/businesses`** *Get all registered businesses*
+
 <u>**Protected endpoints**</u>: Access token is required (`Authorization` header token)
 
 **`POST /api/v1/auth/logout`** *User logout*
@@ -127,7 +147,7 @@ View the API usage (Documentation) in a browser via: http://127.0.0.1:5000/api/v
 
 **`DELETE /api/v1/businesses/<business-id>`** *Delete business*
 
-**`GET /api/v1/businesses`** *Get your registered businesses*
+**`GET /api/v1/account/businesses`** *Get authenticated user's registered businesses*
 
 **`POST /api/v1/businesses/<business-id>/reviews`** *Post a review about business*
 

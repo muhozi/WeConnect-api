@@ -314,7 +314,7 @@ def get_user_businesses():
 @swag_from(GET_ALL_BUSINESSES_DOCS)
 def get_all_businesses():
     """
-        All Business lists
+        Get all Businesses
     """
     businesses = Business.query.all()
     if len(businesses) is not 0:
