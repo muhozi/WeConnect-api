@@ -22,12 +22,6 @@ env:
     - PGPORT=5433
     - DATABASE_URI='postgresql://postgres@localhost:5433/weconnect'
 
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install language-pack-es
-  - sudo /etc/init.d/postgresql stop
-  - sudo /etc/init.d/postgresql start 9.3
-
 before_script:
   - psql -c 'create database weconnect_test;' -U postgres
 
