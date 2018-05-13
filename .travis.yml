@@ -1,3 +1,7 @@
+# Turn off email notifications
+notifications:
+  email: false
+
 language: python
 python:
   - "3.6"
@@ -10,13 +14,6 @@ install:
 services:
   - postgresql
 
-addons:
-  postgresql: "10"
-  apt:
-    packages:
-    - postgresql-10
-    - postgresql-client-10
-
 # Set config for testing on Travis
 env:
   global:
@@ -26,8 +23,8 @@ env:
     - DATABASE_URI='postgresql://test_user:databasepass@localhost:5433/weconnect'
 
 before_script:
-  - psql -c "CREATE USER test_user WITH PASSWORD 'databasepass';" -U postgres
-  - psql -c "CREATE DATABASE weconnect_test owner test_user;" -U postgres
+  - psql -c 'CREATE USER test_user WITH PASSWORD "databasepass";' -U postgres
+  - psql -c 'CREATE DATABASE weconnect_test owner test_user;'' -U postgres
 
 # command to run tests.py
 script:
