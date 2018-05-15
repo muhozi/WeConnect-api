@@ -327,14 +327,13 @@ def get_all_businesses():
     # Filter by search query
     if query is not None and query.strip() is not '':
         businesses = businesses.filter(func.lower(Business.name).like('%'+ func.lower(query) +'%'))
-
     # Filter by city
     if city is not None and city.strip() is not '':
-        businesses = businesses.filter(func.lower(Business.city)==func.lower(city))
+        businesses = businesses.filter(func.lower(Business.city) == func.lower(city))
 
     # Filter by country
     if country is not None and country.strip() is not '':
-        businesses = businesses.filter(func.lower(Business.country)==func.lower(country))
+        businesses = businesses.filter(func.lower(Business.country) == func.lower(country))
 
     # Overall filter results
     businesses = businesses.all()
