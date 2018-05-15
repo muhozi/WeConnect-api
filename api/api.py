@@ -4,6 +4,7 @@
 from functools import wraps
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func
 from flasgger.utils import swag_from
 from api.models.user import User
 from api.models.business import Business
@@ -265,6 +266,7 @@ def update_business(business_id):
         data = {
             'name': sent_data['name'],
             'description': sent_data['description'],
+            'category': sent_data['category'],
             'country': sent_data['country'],
             'city': sent_data['city'],
         }
@@ -317,17 +319,36 @@ def get_all_businesses():
     """
         Get all Businesses
     """
-    businesses = Business.query.all()
-    if len(businesses) is not 0:
+    query = request.args.get('q')
+    city = request.args.get('city')
+    country = request.args.get('country')
+    businesses = Business.query
+
+    # Filter by search query
+    if query is not None and query.strip() is not '':
+        businesses = businesses.filter(func.lower(Business.name).like('%'+ func.lower(query) +'%'))
+
+    # Filter by city
+    if city is not None and city.strip() is not '':
+        businesses = businesses.filter(func.lower(Business.city)==func.lower(city))
+
+    # Filter by country
+    if country is not None and country.strip() is not '':
+        businesses = businesses.filter(func.lower(Business.country)==func.lower(country))
+
+    # Overall filter results
+    businesses = businesses.all()
+
+    if len(Business.serializer(businesses)) is not 0:
         response = jsonify({
             'status': 'ok',
-            'message': 'There are ' + str(len(businesses)) + ' registered businesses',
+            'message': 'There are ' + str(len(businesses)) + ' businesses found',
             'businesses': Business.serializer(businesses)
         })
         response.status_code = 200
         return response
     response = jsonify(
-        status='error', message="There is no registered business")
+        status='error', message="No business found!")
     response.status_code = 200
     return response
 

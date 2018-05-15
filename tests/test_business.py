@@ -23,7 +23,7 @@ class BusinessTests(MainTests):
             self.url_prefix + 'businesses')
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            b'no registered business', response.data)
+            b'No business found', response.data)
 
     def test_business_registration(self):
         '''
@@ -102,6 +102,7 @@ class BusinessTests(MainTests):
         new_business_data = {
             'name': 'TRM',
             'description': 'We got them all',
+            'category': 'Mall',
             'country': 'Kenya',
             'city': 'Nairobi'
         }
@@ -218,7 +219,7 @@ class BusinessTests(MainTests):
             self.url_prefix + 'businesses')
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            b'registered businesses', response.data)
+            b'businesses found', response.data)
 
 
     def test_empty_businesses(self):
@@ -232,7 +233,7 @@ class BusinessTests(MainTests):
             self.url_prefix + 'businesses')
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            b'no registered business', response.data)
+            b'No business found!', response.data)
         
     def test_business(self):
         '''

@@ -95,6 +95,7 @@ class Business(db.Model):
         business = cls.query.filter_by(id=get_id(business_id)).first()
         business.name = data['name']
         business.description = data['description']
+        business.category = data['category']
         business.city = data['city']
         business.country = data['country']
         db.session.add(business)
