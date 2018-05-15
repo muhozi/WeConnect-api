@@ -233,6 +233,7 @@ REGISTER_BUSINESS_DOCS = {
                 "required": [
                     "name",
                     "description",
+                    "category",
                     "country",
                     "city",
                 ],
@@ -246,6 +247,10 @@ REGISTER_BUSINESS_DOCS = {
                     "description": {
                         "type": "string",
                         "example": "We have best coffee"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "Coffee-shop"
                     },
                     "country": {
                         "type": "string",
@@ -308,6 +313,7 @@ UPDATE_BUSINESS_DOCS = {
                 "required": [
                     "name",
                     "description",
+                    "category",
                     "country",
                     "city",
                 ],
@@ -319,6 +325,10 @@ UPDATE_BUSINESS_DOCS = {
                     "description": {
                         "type": "string",
                         "example": "We have best coffee"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "Café-resto"
                     },
                     "country": {
                         "type": "string",
@@ -403,6 +413,10 @@ GET_BUSINESSES_DOCS = {
                                     "type": "string",
                                     "example": "We get best coffee"
                                 },
+                                "category": {
+                                    "type": "string",
+                                    "example": "Coffee-shop"
+                                },
                                 "country": {
                                     "type": "string",
                                     "example": "Rwanda"
@@ -471,6 +485,10 @@ GET_ALL_BUSINESSES_DOCS = {
                                     "type": "string",
                                     "example": "We get best coffee"
                                 },
+                                "category": {
+                                    "type": "string",
+                                    "example": "Coffee-shop"
+                                },
                                 "country": {
                                     "type": "string",
                                     "example": "Rwanda"
@@ -538,6 +556,10 @@ GET_BUSINESS_DOCS = {
                                 "description": {
                                     "type": "string",
                                     "example": "We get best coffee"
+                                },
+                                "category": {
+                                    "type": "string",
+                                    "example": "Coffee-shop"
                                 },
                                 "country": {
                                     "type": "string",
@@ -647,6 +669,10 @@ BUSINESS_REVIEWS_DOCS = {
                                 "description": {
                                     "type": "string",
                                     "example": "We get best coffee"
+                                },
+                                "category": {
+                                    "type": "string",
+                                    "example": "Coffee-shop"
                                 },
                                 "country": {
                                     "type": "string",

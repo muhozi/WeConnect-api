@@ -32,6 +32,7 @@ class BusinessTests(MainTests):
         response = self.app.post(self.url_prefix + 'businesses', data=json.dumps({
             'name': 'Inzora rooftop coffee',
             'description': 'We have best coffee',
+            'category': 'Coffee-shop',
             'country': 'Kenya',
             'city': 'Nairobi'
         }), headers={'Authorization': self.test_token})
@@ -47,6 +48,7 @@ class BusinessTests(MainTests):
             'user_id': self.sample_user['id'],
             'name': self.rev_business_data['name'],
             'description': self.rev_business_data['description'],
+            'category':self.rev_business_data['category'],
             'country': self.rev_business_data['country'],
             'city': self.rev_business_data['city'],
         }), headers={'Authorization': self.test_token})
@@ -142,6 +144,7 @@ class BusinessTests(MainTests):
             'user_id': self.sample_user['id'],
             'name': 'TRM',
             'description': 'Enjoy Coffee and Pizzas',
+            'category': 'Mall',
             'country': 'Kenya',
             'city': 'Nakuru'
         }
@@ -149,6 +152,7 @@ class BusinessTests(MainTests):
             user_id=self.sample_user['id'],
             name='TRM',
             description=self.business_data['description'],
+            category=self.business_data['category'],
             country=self.business_data['country'],
             city=self.business_data['city'],
         )

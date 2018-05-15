@@ -44,6 +44,7 @@ class MainTests(unittest.TestCase):
         self.business_data = {
             'name': 'Inzora rooftop coffee',
             'description': 'We have best coffee for you,',
+            'category':'Coffee-shop',
             'country': 'Kenya',
             'city': 'Nairobi'
         }
@@ -51,6 +52,7 @@ class MainTests(unittest.TestCase):
         self.rev_business_data = {
             'name': 'KFC',
             'description': 'Finger lickin\' good',
+            'category':'Food',
             'country': 'Kenya',
             'city': 'Nairobi'
         }
@@ -87,6 +89,7 @@ class MainTests(unittest.TestCase):
                 user_id=self.sample_user['id'],
                 name=self.rev_business_data['name'],
                 description=self.rev_business_data['description'],
+                category=self.rev_business_data['category'],
                 country=self.rev_business_data['country'],
                 city=self.rev_business_data['city'],
             )
@@ -109,6 +112,7 @@ class MainTests(unittest.TestCase):
             user_id=self.sample_user['id'],
             name=self.business_data['name'],
             description=self.business_data['description'],
+            category=self.business_data['category'],
             country=self.business_data['country'],
             city=self.business_data['city'],
         )

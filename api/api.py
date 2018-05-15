@@ -206,6 +206,7 @@ def register_business():
         user_id=user_id,
         name=sent_data['name'],
         description=sent_data['description'],
+        category=sent_data['category'],
         country=sent_data['country'],
         city=sent_data['city']
     )

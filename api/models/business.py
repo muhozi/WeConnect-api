@@ -10,9 +10,10 @@ class Business(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(180), index=False, nullable=False)
+    description = db.Column(db.Text, index=False, nullable=False)
     country = db.Column(db.String(128), index=False, nullable=False)
     city = db.Column(db.String(128), index=False, nullable=False)
-    description = db.Column(db.Text, index=False, nullable=False)
+    category = db.Column(db.String(128), index=False, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(
         db.DateTime, default=db.func.now(), nullable=False)
@@ -46,6 +47,7 @@ class Business(db.Model):
                 'user_id': hashid(data.user_id),
                 'name': data.name,
                 'description': data.description,
+                'category': data.category,
                 'country': data.country,
                 'city': data.city,
                 'created_at': data.created_at,
