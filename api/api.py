@@ -323,6 +323,8 @@ def get_all_businesses():
     category = request.args.get('category')
     city = request.args.get('city')
     country = request.args.get('country')
+    page = request.args.get('page')
+    per_page = request.args.get('limit')
     businesses = Business.query
 
     # Filter by search query
@@ -340,15 +342,35 @@ def get_all_businesses():
     # Filter by country
     if country is not None and country.strip() is not '':
         businesses = businesses.filter(func.lower(Business.country) == func.lower(country))
+    
+    errors = [] # Errors list
+
+    if per_page is not None and per_page.isdigit() is False and per_page.strip() is not '':
+        errors.append({'limit':'Invalid limit page limit number'})
+
+    if page is not None and page.isdigit() is False and page.strip() is not '':
+        errors.append({'page':'Invalid page number'})
+
+    if len(errors) is not 0:
+        response = jsonify(
+            status='error', message="Please provide valid details", errors=errors)
+        response.status_code = 400
+        return response
+
+    page = int(page) if page is not None and page.strip() is not '' else 1
+    per_page = int(per_page) if per_page is not None and per_page.strip() is not '' else 20
 
     # Overall filter results
-    businesses = businesses.all()
+    businesses = businesses.paginate(per_page=per_page, page=page)
 
-    if len(Business.serializer(businesses)) is not 0:
+    if len(Business.serializer(businesses.items)) is not 0:
         response = jsonify({
             'status': 'ok',
-            'message': 'There are ' + str(len(businesses)) + ' businesses found',
-            'businesses': Business.serializer(businesses)
+            'message': 'There are ' + str(len(businesses.items)) + ' businesses found',
+            'next_page': businesses.next_num,
+            'previous_page': businesses.prev_num,
+            'total_businesses': businesses.total,
+            'businesses': Business.serializer(businesses.items)
         })
         response.status_code = 200
         return response
