@@ -217,8 +217,9 @@ class BusinessTests(MainTests):
         # Save businesses to test
         response = self.app.get(
             self.url_prefix + 'businesses?q='+self.business_data['name']+
-            '&country='+self.business_data['country']+'&city='+
-            self.business_data['city']
+            '&country='+self.business_data['country']+
+            '&city='+self.business_data['city']+
+            '&category='+self.business_data['category']
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn(

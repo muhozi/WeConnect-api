@@ -320,6 +320,7 @@ def get_all_businesses():
         Get all Businesses
     """
     query = request.args.get('q')
+    category = request.args.get('category')
     city = request.args.get('city')
     country = request.args.get('country')
     businesses = Business.query
@@ -327,6 +328,11 @@ def get_all_businesses():
     # Filter by search query
     if query is not None and query.strip() is not '':
         businesses = businesses.filter(func.lower(Business.name).like('%'+ func.lower(query) +'%'))
+
+    # Filter by category
+    if category is not None and category.strip() is not '':
+        businesses = businesses.filter(func.lower(Business.category) == func.lower(category))
+
     # Filter by city
     if city is not None and city.strip() is not '':
         businesses = businesses.filter(func.lower(Business.city) == func.lower(city))

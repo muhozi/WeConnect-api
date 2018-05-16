@@ -450,6 +450,15 @@ GET_ALL_BUSINESSES_DOCS = {
             "required": False,
         },
         {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by category",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
             "name": "country",
             "in": "query",
             "description": "Filter by country",
