@@ -1,6 +1,18 @@
+# Turn off email notifications
+notifications:
+  email: false
+addons:
+    postgresql: "9.5"
+
+services:
+    - postgresql
+
 language: python
 python:
   - "3.6"
+
+before_script:
+  - psql -c 'create database weconnect_test;' -U postgres
 
 # command to install dependencies
 install:
@@ -11,6 +23,9 @@ env:
   global:
     - SECRET_KEY=96da21865b3e3774d7b2f0cb15cf5ee4f7c1ce09042745ca
     - DEBUG=True
+    - DATABASE_URI='postgresql://postgres@localhost/weconnect'
+
+
 
 # command to run tests.py
 script:

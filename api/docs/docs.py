@@ -233,6 +233,7 @@ REGISTER_BUSINESS_DOCS = {
                 "required": [
                     "name",
                     "description",
+                    "category",
                     "country",
                     "city",
                 ],
@@ -246,6 +247,10 @@ REGISTER_BUSINESS_DOCS = {
                     "description": {
                         "type": "string",
                         "example": "We have best coffee"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "Coffee-shop"
                     },
                     "country": {
                         "type": "string",
@@ -308,6 +313,7 @@ UPDATE_BUSINESS_DOCS = {
                 "required": [
                     "name",
                     "description",
+                    "category",
                     "country",
                     "city",
                 ],
@@ -319,6 +325,10 @@ UPDATE_BUSINESS_DOCS = {
                     "description": {
                         "type": "string",
                         "example": "We have best coffee"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "Café-resto"
                     },
                     "country": {
                         "type": "string",
@@ -371,7 +381,7 @@ GET_BUSINESSES_DOCS = {
     ],
     "responses": {
         "200": {
-            "description": "Return response status and message and a list of authenticated user businesses ",
+            "description": ("Get all authenticated user's businesses list "),
             "schema": {
                 "id": "get_business_response",
                 "properties": {
@@ -402,6 +412,82 @@ GET_BUSINESSES_DOCS = {
                                 "description": {
                                     "type": "string",
                                     "example": "We get best coffee"
+                                },
+                                "category": {
+                                    "type": "string",
+                                    "example": "Coffee-shop"
+                                },
+                                "country": {
+                                    "type": "string",
+                                    "example": "Rwanda"
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "example": "Kigali"
+                                },
+                            }
+                        }
+                    },
+                }
+            },
+        }
+    }
+}
+
+GET_ALL_BUSINESSES_DOCS = {
+    "tags": [
+        "Business"
+    ],
+    "description": "Get a list all businesses",
+    # "parameters": [
+    #     {
+    #         "name": "Authorization",
+    #         "in": "header",
+    #         "description": "Authorization token",
+    #         "schema": {
+    #             "type": "string",
+    #             "format": "uuid",
+    #         },
+    #         "required": True,
+    #     }
+    # ],
+    "responses": {
+        "200": {
+            "description": "Return all registered businesses ",
+            "schema": {
+                "id": "get_business_response",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "You have businesses 1 registered businesses"
+                    },
+                    "businesses": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "string",
+                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                },
+                                "user_id": {
+                                    "type": "string",
+                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "example": "Inzora rooftop"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "example": "We get best coffee"
+                                },
+                                "category": {
+                                    "type": "string",
+                                    "example": "Coffee-shop"
                                 },
                                 "country": {
                                     "type": "string",
@@ -470,6 +556,10 @@ GET_BUSINESS_DOCS = {
                                 "description": {
                                     "type": "string",
                                     "example": "We get best coffee"
+                                },
+                                "category": {
+                                    "type": "string",
+                                    "example": "Coffee-shop"
                                 },
                                 "country": {
                                     "type": "string",
@@ -548,7 +638,7 @@ BUSINESS_REVIEWS_DOCS = {
     ],
     "responses": {
         "200": {
-            "description": "Return response status and message,business details and a list of business reviews ",
+            "description": "Return business reviews ",
             "schema": {
                 "id": "business_reviews_response",
                 "properties": {
@@ -579,6 +669,10 @@ BUSINESS_REVIEWS_DOCS = {
                                 "description": {
                                     "type": "string",
                                     "example": "We get best coffee"
+                                },
+                                "category": {
+                                    "type": "string",
+                                    "example": "Coffee-shop"
                                 },
                                 "country": {
                                     "type": "string",

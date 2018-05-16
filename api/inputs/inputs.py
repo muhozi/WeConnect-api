@@ -3,9 +3,9 @@ from api.validations import Validations
 # Registration validations
 REGISTER_RULES = [
     {'username': [('string', True), ('minimum', 4),
-                  ('maximum', 30), ('required', True)]},
+                  ('maximum', 30), ('required', True), ('unique', 'User:username')]},
     {'email': [('minimum', 6), ('maximum', 30),
-               ('required', True), ('email', True)]},
+               ('required', True), ('email', True), ('unique', 'User:email')]},
     {'password': [('minimum', 6), ('maximum', 30), ('required', True)]},
     {'confirm_password': [('minimum', 6), ('maximum', 30),
                           ('required', True), ('same', 'password')]},
@@ -30,6 +30,8 @@ REGISTER_BUSINESS_RULES = [
 REVIEW_RULES = [
     {'review': [('minimum', 4), ('required', True)]},
 ]
+
+
 def validate(inputs, all_rules):
     """ Register validation method """
     error_bag = {}
@@ -48,6 +50,6 @@ def validate(inputs, all_rules):
                     else:
                         error_bag[rule_key] = []
                         error_bag[rule_key].append(execute)
-    if len(error_bag) > 0:
+    if len(error_bag) is not 0:
         return error_bag
     return True

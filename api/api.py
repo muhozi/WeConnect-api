@@ -1,22 +1,21 @@
 """
     Our Main api routes
 """
-import datetime
-import uuid
 from functools import wraps
 from flask import Blueprint, jsonify, request
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from flasgger.utils import swag_from
-from api.models.store import Store
 from api.models.user import User
 from api.models.business import Business
 from api.models.review import Review
+from api.models.token import Token
 from api.docs.docs import (REGISTER_DOCS,
                            LOGIN_DOCS,
                            LOGOUT_DOCS,
                            RESET_PASSWORD_DOCS,
                            REGISTER_BUSINESS_DOCS,
                            GET_BUSINESSES_DOCS,
+                           GET_ALL_BUSINESSES_DOCS,
                            UPDATE_BUSINESS_DOCS,
                            DELETE_BUSINESS_DOCS,
                            BUSINESS_REVIEWS_DOCS,
@@ -26,9 +25,9 @@ from api.inputs.inputs import (
     validate, REGISTER_RULES, LOGIN_RULES, RESET_PWD_RULES,
     REGISTER_BUSINESS_RULES, REVIEW_RULES)
 from api.helpers import get_token, token_id
+from api import db
 
 API = Blueprint('v1', __name__, url_prefix='/api/v1')
-STORE = Store
 
 
 def auth(arg):
@@ -38,7 +37,8 @@ def auth(arg):
         """ Check if token exists in the request header"""
         if request.headers.get('Authorization'):
             token = request.headers.get('Authorization')
-            if User.token_exists(token) and token_id(token):
+            token_exist = Token.query.filter_by(access_token=token).first()
+            if token_exist is not None and token_id(token):
                 return arg(*args, **kwargs)
         response = jsonify({
             'status': 'error',
@@ -62,20 +62,13 @@ def register():
             status='error', message="Please provide valid details", errors=valid)
         response.status_code = 400
         return response
-    data = {
-        'id': uuid.uuid4().hex,
-        'username': sent_data['username'],
-        'email': sent_data['email'],
-        'password': sent_data['password'],
-    }
-    if User.user_exists(data['email']):
-        response = jsonify({
-            'status': 'error',
-            'message': "Sorry the email address has been taken"
-        })
-        response.status_code = 400
-        return response
-    User.save(data)
+    user = User(
+        username=sent_data['username'],
+        email=sent_data['email'],
+        password=generate_password_hash(sent_data['password'])
+    )
+    db.session.add(user)
+    db.session.commit()
     response = jsonify({
         'status': 'ok',
         'message': "You have been successfully registered"
@@ -91,7 +84,10 @@ def logout():
     """
         User logout
     """
-    Store.remove_token(request.headers.get('Authorization'))
+    token = Token.query.filter_by(
+        access_token=request.headers.get('Authorization')).first()
+    db.session.delete(token)
+    db.session.commit()
     response = jsonify({
         'status': 'ok',
         'message': "You have successfully logged out"
@@ -117,17 +113,22 @@ def login():
         'email': sent_data['email'],
         'password': sent_data['password'],
     }
-    # Check if email exists in the store
+    # Check if email exists
     logged_user = User.get_user(data['email'])
     if logged_user:
         # Check password
-        if check_password_hash(logged_user['password'], data['password']):
-            token = get_token(logged_user['id'])
-            User.add_token(token)
+        if check_password_hash(logged_user.password, data['password']):
+            token_ = get_token(logged_user.id)
+            token = Token(
+                user_id=logged_user.id,
+                access_token=token_,
+            )
+            db.session.add(token)
+            db.session.commit()
             response = jsonify({
                 'status': 'ok',
                 'message': 'You have been successfully logged in',
-                'access_token': token,
+                'access_token': token.access_token,
             })
             response.status_code = 200
             # response.headers['auth_token'] = token
@@ -162,14 +163,17 @@ def reset_password():
         response.status_code = 400
         return response
     user_id = token_id(request.headers.get('Authorization'))
-    if User.check_password(user_id, sent_data['old_password']) != True:
+    user = User.query.filter_by(id=user_id).first()
+    if check_password_hash(user.password, sent_data['old_password']) is False:
         response = jsonify({
             'status': 'error',
             'message': "Invalid old password"
         })
         response.status_code = 400
         return response
-    User.change_password(user_id, sent_data['new_password'])
+    user.password = generate_password_hash(sent_data['new_password'])
+    db.session.add(user)
+    db.session.commit()
     response = jsonify({
         'status': 'ok',
         'message': "You have successfully changed your password"
@@ -193,20 +197,21 @@ def register_business():
         response.status_code = 400
         return response
     user_id = token_id(request.headers.get('Authorization'))
-    data = {
-        'id': uuid.uuid4().hex,
-        'user_id': user_id,
-        'name': sent_data['name'],
-        'description': sent_data['description'],
-        'country': sent_data['country'],
-        'city': sent_data['city'],
-    }
-    if Business.has_same_business(user_id, sent_data['name']):
+    if Business.query.filter_by(user_id=user_id, name=sent_data['name']).first() is not None:
         response = jsonify(
-            status='error', message="You have already registered this business")
+            status='error', message="You have already a registered business with the same name")
         response.status_code = 400
         return response
-    Business.save(data)
+    business = Business(
+        user_id=user_id,
+        name=sent_data['name'],
+        description=sent_data['description'],
+        category=sent_data['category'],
+        country=sent_data['country'],
+        city=sent_data['city']
+    )
+    db.session.add(business)
+    db.session.commit()
     response = jsonify({
         'status': 'ok',
         'message': "Your business has been successfully registered"
@@ -223,8 +228,10 @@ def delete_business(business_id):
         Delete business
     """
     user_id = token_id(request.headers.get('Authorization'))
-    if Business.has_this_business(user_id, business_id):
-        Business.delete_business(business_id)
+    business = Business.get_by_user(business_id, user_id)
+    if business is not None:
+        db.session.delete(business)
+        db.session.commit()
         response = jsonify({
             'status': 'ok',
             'message': "Your business has been successfully deleted"
@@ -247,7 +254,8 @@ def update_business(business_id):
     """
     sent_data = request.get_json(force=True)
     user_id = token_id(request.headers.get('Authorization'))
-    if Business.has_this_business(user_id, business_id):
+    business = Business.get_by_user(business_id, user_id)
+    if business is not None:
         valid = validate(sent_data, REGISTER_BUSINESS_RULES)
         if valid != True:
             response = jsonify(
@@ -255,7 +263,6 @@ def update_business(business_id):
             response.status_code = 400
             return response
         data = {
-            'user_id': user_id,
             'name': sent_data['name'],
             'description': sent_data['description'],
             'country': sent_data['country'],
@@ -264,7 +271,7 @@ def update_business(business_id):
         if Business.has_two_same_business(user_id, sent_data['name'], business_id):
             response = jsonify(
                 status='error',
-                message="You have already registered this other business with same name")
+                message="You have already registered a business with same name")
             response.status_code = 400
             return response
         Business.update(business_id, data)
@@ -281,26 +288,47 @@ def update_business(business_id):
     return response
 
 
-@API.route('/businesses', methods=['GET'])
+@API.route('/account/businesses', methods=['GET'])
 @auth
 @swag_from(GET_BUSINESSES_DOCS)
 def get_user_businesses():
     """
-        Business lists
+        User's Businesses list
     """
     user_id = token_id(request.headers.get('Authorization'))
-    if Business.has_business(user_id):
-        businesses = Business.user_businesses(user_id)
+    businesses = Business.user_businesses(user_id)
+    if len(businesses) is not 0:
         response = jsonify({
             'status': 'ok',
             'message': 'You have businesses ' + str(len(businesses)) + ' registered businesses',
-            'businesses': businesses
+            'businesses': Business.serializer(businesses)
         })
         response.status_code = 200
         return response
     response = jsonify(
-        status='error', message="You don't have registered business")
-    response.status_code = 204
+        status='error', message="You don't have registered any business")
+    response.status_code = 200
+    return response
+
+
+@API.route('/businesses', methods=['GET'])
+@swag_from(GET_ALL_BUSINESSES_DOCS)
+def get_all_businesses():
+    """
+        Get all Businesses
+    """
+    businesses = Business.query.all()
+    if len(businesses) is not 0:
+        response = jsonify({
+            'status': 'ok',
+            'message': 'There are ' + str(len(businesses)) + ' registered businesses',
+            'businesses': Business.serializer(businesses)
+        })
+        response.status_code = 200
+        return response
+    response = jsonify(
+        status='error', message="There is no registered business")
+    response.status_code = 200
     return response
 
 
@@ -310,13 +338,12 @@ def get_business(business_id):
     """
         Get business
     """
-    if business_id in [business['id'] for business in Store.businesses]:
-        business = Business.get_business(
-            business_id)  # Get business details
+    business = Business.get(business_id)
+    if business is not None:
         response = jsonify({
             'status': 'ok',
             'message': 'Business found',
-            'business': business,
+            'business': Business.serialize_obj(business),
         })
         response.status_code = 200
         return response
@@ -335,25 +362,26 @@ def add_business_review(business_id):
     """
         Add Review
     """
-    if business_id in [business['id'] for business in Store.businesses]:
+    user_id = token_id(request.headers.get('Authorization'))
+    business = Business.get(business_id)
+    if business is not None:
         sent_data = request.get_json(force=True)
         valid = validate(sent_data, REVIEW_RULES)
-        if valid != True:
+        if valid is not True:
             response = jsonify(
                 status='error', message='Please provide valid details', errors=valid)
             response.status_code = 400
             return response
-        user_id = token_id(request.headers.get('Authorization'))
-        data = {
-            'id': uuid.uuid4().hex,
-            'user_id': user_id,
-            'review': sent_data['review'],
-            'created_at': f"{datetime.datetime.now():%Y-%m-%d %H:%M}",
-        }
-        Review.save(business_id, data)
+        review = Review(
+            user_id=user_id,
+            description=sent_data['review'],
+            business_id=business.id
+        )
+        db.session.add(review)
+        db.session.commit()
         response = jsonify({
             'status': 'ok',
-            'message': "Your review has been submitted"
+            'message': "Your review has been sent"
         })
         response.status_code = 201
         return response
@@ -371,24 +399,25 @@ def get_business_reviews(business_id):
     """
         Business reviews
     """
-    if business_id in [business['id'] for business in Store.businesses]:
-        if business_id in Store.reviews:
-            reviews = Store.reviews[business_id]
-            business = Business.get_business(
-                business_id)  # Get business details
+    business = Business.get(business_id)
+    if business is not None:
+        reviews = Review.query.filter_by(id=Business.get(business_id).id).all()
+        if len(reviews) is not 0:
             response = jsonify({
                 'status': 'ok',
                 'message': str(len(reviews)) + " reviews found",
-                'business': business,
-                'reviews': reviews
+                'business': Business.serialize_obj(business),
+                'reviews': Review.serializer(reviews)
             })
             response.status_code = 200
             return response
         response = jsonify({
             'status': 'ok',
-            'message': "No business review yet"
+            'message': "No business review yet",
+            'business': Business.serialize_obj(business),
+            'reviews': []
         })
-        response.status_code = 204
+        response.status_code = 200
         return response
     response = jsonify({
         'status': 'error',
