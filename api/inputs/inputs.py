@@ -24,6 +24,7 @@ RESET_PWD_RULES = [
 REGISTER_BUSINESS_RULES = [
     {'name': [('minimum', 2), ('required', True)]},
     {'description': [('minimum', 6), ('required', True)]},
+    {'category': [('minimum', 4), ('required', True)]},
     {'country': [('minimum', 4), ('required', True)]},
     {'city': [('minimum', 6), ('required', True)]},
 ]

@@ -30,7 +30,7 @@ class ReviewTests(MainTests):
 
     def test_add_invalid_business_rev(self):
         '''
-            Test adding business review to business which doesn't exist
+            Test adding review to business which doesn't exist
         '''
         response = self.app.post(self.url_prefix + 'businesses/hdfbsjd/reviews',
                                  data=json.dumps({
@@ -42,7 +42,7 @@ class ReviewTests(MainTests):
 
     def test_adding_empty_review(self):
         '''
-            Test adding business review to business which doesn't exist
+            Test adding empty review
         '''
         self.add_business()
         response = self.app.post(self.url_prefix + 'businesses/' +
@@ -101,7 +101,7 @@ class ReviewTests(MainTests):
 
     def test_add_rev_invalid_business(self):
         '''
-            Test adding business review to business which doesn't exist
+            Test adding a review to non-exist business 
         '''
         response = self.app.post(self.url_prefix + 'businesses/hdfbsjd/reviews',
                                  data=json.dumps({

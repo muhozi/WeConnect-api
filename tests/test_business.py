@@ -23,7 +23,7 @@ class BusinessTests(MainTests):
             self.url_prefix + 'businesses')
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            b'no registered business', response.data)
+            b'No business found', response.data)
 
     def test_business_registration(self):
         '''
@@ -102,6 +102,7 @@ class BusinessTests(MainTests):
         new_business_data = {
             'name': 'TRM',
             'description': 'We got them all',
+            'category': 'Mall',
             'country': 'Kenya',
             'city': 'Nairobi'
         }
@@ -206,6 +207,24 @@ class BusinessTests(MainTests):
             self.url_prefix + 'account/businesses', headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 200)
 
+    def test_search_filters(self):
+        '''
+            Test business search and filters
+        '''
+        self.add_business()
+        # Add user(owner) to the business data dict
+        self.business_data['user_id'] = self.sample_user['id']
+        # Save businesses to test
+        response = self.app.get(
+            self.url_prefix + 'businesses?q='+self.business_data['name']+
+            '&country='+self.business_data['country']+
+            '&city='+self.business_data['city']+
+            '&category='+self.business_data['category']
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'businesses found', response.data)
+
     def test_all_businesses(self):
         '''
             Test retrieving all registered businesses
@@ -218,7 +237,7 @@ class BusinessTests(MainTests):
             self.url_prefix + 'businesses')
         self.assertEqual(response.status_code, 200)
         self.assertIn(
-            b'registered businesses', response.data)
+            b'businesses found', response.data)
 
 
     def test_empty_businesses(self):
@@ -231,9 +250,8 @@ class BusinessTests(MainTests):
         response = self.app.get(
             self.url_prefix + 'businesses')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            b'no registered business', response.data)
-        
+        self.assertIn(b'No business found!', response.data)
+
     def test_business(self):
         '''
             Test retrieving business details
