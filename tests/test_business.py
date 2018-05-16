@@ -219,11 +219,30 @@ class BusinessTests(MainTests):
             self.url_prefix + 'businesses?q='+self.business_data['name']+
             '&country='+self.business_data['country']+
             '&city='+self.business_data['city']+
-            '&category='+self.business_data['category']
+            '&category='+self.business_data['category']+
+            '&limit='+'1'+
+            '&page=1'
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             b'businesses found', response.data)
+
+    def test_invalid_page_params(self):
+        '''
+            Test retrieving business with invalid params
+        '''
+        self.add_business()
+        # Add user(owner) to the business data dict
+        self.business_data['user_id'] = self.sample_user['id']
+        # Save businesses to test
+        response = self.app.get(
+            self.url_prefix + 'businesses?'+
+            'limit='+'notInt'+
+            '&page=notInt'
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Please provide valid details', response.data)
 
     def test_all_businesses(self):
         '''

@@ -475,6 +475,24 @@ GET_ALL_BUSINESSES_DOCS = {
                 "type": "string",
             },
             "required": False,
+        },
+        {
+            "name": "limit",
+            "in": "query",
+            "description": "Businesses limit per page",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
         }
     ],
     "responses": {
