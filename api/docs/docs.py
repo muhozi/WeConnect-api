@@ -439,18 +439,35 @@ GET_ALL_BUSINESSES_DOCS = {
         "Business"
     ],
     "description": "Get a list all businesses",
-    # "parameters": [
-    #     {
-    #         "name": "Authorization",
-    #         "in": "header",
-    #         "description": "Authorization token",
-    #         "schema": {
-    #             "type": "string",
-    #             "format": "uuid",
-    #         },
-    #         "required": True,
-    #     }
-    # ],
+    "parameters": [
+        {
+            "name": "q",
+            "in": "query",
+            "description": "Query string to search business",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "country",
+            "in": "query",
+            "description": "Filter by country",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "city",
+            "in": "query",
+            "description": "Filter by city",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        }
+    ],
     "responses": {
         "200": {
             "description": "Return all registered businesses ",
