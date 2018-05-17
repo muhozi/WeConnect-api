@@ -47,6 +47,12 @@ Activate the virtual environment [For windows]
 cd env/Scripts && activate && cd ../..
 ```
 
+Activate the virtual environment [For Unix based system]
+
+```sh
+source env/bin/activate
+```
+
 Install dependencies using pip
 
 ```sh
