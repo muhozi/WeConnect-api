@@ -449,7 +449,7 @@ def get_business_reviews(business_id):
     """
     business = Business.get(business_id)
     if business is not None:
-        reviews = Review.query.filter_by(id=Business.get(business_id).id).all()
+        reviews = Review.query.filter_by(business_id=Business.get(business_id).id).all()
         if len(reviews) is not 0:
             response = jsonify({
                 'status': 'ok',
