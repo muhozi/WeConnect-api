@@ -12,13 +12,27 @@ REGISTER_RULES = [
 ]
 # Login validation
 LOGIN_RULES = [
-    {'email': [('minimum', 6), ('required', True)]},
+    {'email': [('minimum', 6), ('maximum', 30),
+               ('required', True), ('email', True)]},
     {'password': [('minimum', 6), ('required', True)]},
+]
+# Change password validations
+CHANGE_PWD_RULES = [
+    {'new_password': [('minimum', 6), ('maximum', 30), ('required', True)]},
+    {'old_password': [('minimum', 6), ('maximum', 30), ('required', True)]},
 ]
 # Reset password validations
 RESET_PWD_RULES = [
-    {'new_password': [('minimum', 6), ('maximum', 30), ('required', True)]},
-    {'old_password': [('minimum', 6), ('maximum', 30), ('required', True)]},
+    {'email': [('minimum', 6), ('maximum', 30),
+               ('required', True), ('email', True)]},
+    {'password': [('minimum', 6), ('maximum', 30), ('required', True)]},
+    {'confirm_password': [('minimum', 6), ('maximum', 30),
+                          ('required', True), ('same', 'password')]},
+]
+# Reset password validations
+RESET_LINK_RULES = [
+    {'email': [('minimum', 6), ('maximum', 30),
+               ('required', True), ('email', True)]}
 ]
 # Register business validation rules
 REGISTER_BUSINESS_RULES = [

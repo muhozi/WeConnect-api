@@ -4,12 +4,10 @@
 from flask import Flask
 from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from dotenv import load_dotenv
 from config import api_config
 
 db = SQLAlchemy()
-
 from api.api import API
 
 

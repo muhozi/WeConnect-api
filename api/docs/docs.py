@@ -153,7 +153,116 @@ LOGOUT_DOCS = {
     }
 }
 
+RESET_LINK_DOCS = {
+    "tags": [
+        "User"
+    ],
+    "description": "Send password reset link",
+    "parameters": [
+        {
+            "name": "body",
+            "in": "body",
+            "description": "Email",
+            "required": True,
+            "schema": {
+                "id": "reset_link_schema",
+                "required": [
+                    "email",
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "muhozie@gmail.com"
+                    }
+                }
+            }
+        }
+    ],
+    "responses": {
+        "201": {
+            "description": "Return response status and message",
+            "schema": {
+                "id": "reset_password_response",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Your password has been changed successfully"
+                    },
+                }
+            }
+        }
+    }
+}
+
 RESET_PASSWORD_DOCS = {
+    "tags": [
+        "User"
+    ],
+    "description": "Change password by providing old and new passwords",
+    "parameters": [
+        {
+            "name": "token",
+            "in": "path",
+            "description": "Reset token",
+            "schema": {
+                "type": "string",
+            },
+            "required": True,
+        },
+        {
+            "name": "body",
+            "in": "body",
+            "description": "Old password & New password",
+            "required": True,
+            "schema": {
+                "id": "reset_password_schema",
+                "required": [
+                    "email",
+                    "old_password",
+                    "confirm_password",
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "muhozie@gmail.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "123456"
+                    },
+                    "confirm_password": {
+                        "type": "string",
+                        "example": "12345678"
+                    },
+                }
+            }
+        }
+    ],
+    "responses": {
+        "201": {
+            "description": "Return response status and message",
+            "schema": {
+                "id": "reset_password_response",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Your password has been changed successfully"
+                    },
+                }
+            }
+        }
+    }
+}
+
+CHANGE_PASSWORD_DOCS = {
     "tags": [
         "User"
     ],
@@ -172,7 +281,7 @@ RESET_PASSWORD_DOCS = {
             "description": "Old password & New password",
             "required": True,
             "schema": {
-                "id": "reset_password_schema",
+                "id": "change_password_schema",
                 "required": [
                     "old_password",
                     "new_password"

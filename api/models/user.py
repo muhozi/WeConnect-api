@@ -21,6 +21,4 @@ class User(db.Model):
     def get_user(cls, email):
         """Check if user exists and return user details"""
         user = User.query.filter_by(email=email).first()
-        if user is None:
-            return False
         return user

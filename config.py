@@ -13,6 +13,8 @@ class Config():
     JSON_SORT_KEYS = False
     # Configs loaded from env
     SECRET_KEY = os.getenv('SECRET_KEY')
+    SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+    SENDGRID_DEFAULT_FROM = os.getenv('SENDGRID_DEFAULT_FROM ')
 
 
 class ProductionConfig(Config):

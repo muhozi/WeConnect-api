@@ -1,6 +1,7 @@
 """
     Our Main api routes
 """
+import ssl
 from functools import wraps
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,10 +11,13 @@ from api.models.user import User
 from api.models.business import Business
 from api.models.review import Review
 from api.models.token import Token
+from api.models.password_reset import PasswordReset
 from api.docs.docs import (REGISTER_DOCS,
                            LOGIN_DOCS,
                            LOGOUT_DOCS,
+                           RESET_LINK_DOCS,
                            RESET_PASSWORD_DOCS,
+                           CHANGE_PASSWORD_DOCS,
                            REGISTER_BUSINESS_DOCS,
                            GET_BUSINESSES_DOCS,
                            GET_ALL_BUSINESSES_DOCS,
@@ -24,12 +28,14 @@ from api.docs.docs import (REGISTER_DOCS,
                            GET_BUSINESS_DOCS)
 from api.inputs.inputs import (
     validate, REGISTER_RULES, LOGIN_RULES, RESET_PWD_RULES,
+    CHANGE_PWD_RULES, RESET_LINK_RULES,
     REGISTER_BUSINESS_RULES, REVIEW_RULES)
-from api.helpers import get_token, token_id
+from api.helpers import get_token, token_id, generate_reset_token, send_mail
 from api import db
 
 API = Blueprint('v1', __name__, url_prefix='/api/v1')
-
+# Monkey patch SSL Error
+ssl._create_default_https_context = ssl._create_unverified_context
 
 def auth(arg):
     """ Auth middleware to check logged in user"""
@@ -116,7 +122,7 @@ def login():
     }
     # Check if email exists
     logged_user = User.get_user(data['email'])
-    if logged_user:
+    if logged_user is not None:
         # Check password
         if check_password_hash(logged_user.password, data['password']):
             token_ = get_token(logged_user.id)
@@ -148,15 +154,15 @@ def login():
     return response
 
 
-@API.route('/auth/reset-password', methods=['POST'])
+@API.route('/auth/change-password', methods=['POST'])
 @auth
-@swag_from(RESET_PASSWORD_DOCS)
-def reset_password():
+@swag_from(CHANGE_PASSWORD_DOCS)
+def change_password():
     """
-        User password reset
+        Change password
     """
     sent_data = request.get_json(force=True)
-    valid = validate(sent_data, RESET_PWD_RULES)
+    valid = validate(sent_data, CHANGE_PWD_RULES)
     if valid != True:
         response = jsonify(status='error',
                            message="Please provide valid details",
@@ -182,6 +188,75 @@ def reset_password():
     response.status_code = 201
     return response
 
+@API.route('/auth/reset-password/<token>', methods=['POST'])
+@swag_from(RESET_PASSWORD_DOCS)
+def reset_password(token):
+    """
+        Reset password reset
+    """
+    sent_data = request.get_json(force=True)
+    valid = validate(sent_data, RESET_PWD_RULES)
+    if valid != True:
+        response = jsonify(status='error',
+                           message="Please provide valid details",
+                           errors=valid)
+        response.status_code = 400
+        return response
+    token = PasswordReset.query.filter_by(reset_token=token).first()
+    if token is None:
+        response = jsonify({
+            'status': 'error',
+            'message': "Invalid reset token"
+        })
+        response.status_code = 400
+        return response
+    user = User.query.filter_by(id=token.user_id).first()
+    user.password = generate_password_hash(sent_data['password'])
+    db.session.add(user)
+    db.session.commit()
+    db.session.delete(token)
+    db.session.commit()
+    response = jsonify({
+        'status': 'ok',
+        'message': "You have successfully reset your password"
+    })
+    response.status_code = 201
+    return response
+
+@API.route('/auth/reset-password', methods=['POST'])
+@swag_from(RESET_LINK_DOCS)
+def reset_link():
+    """
+        Reset link
+    """
+    sent_data = request.get_json(force=True)
+    valid = validate(sent_data, RESET_LINK_RULES)
+    if valid != True:
+        response = jsonify(status='error',
+                           message="Please provide valid details",
+                           errors=valid)
+        response.status_code = 400
+        return response
+    user = User.query.filter_by(email=sent_data['email']).first()
+    if user is None:
+        response = jsonify({
+            'status': 'error',
+            'message': "Email doesn't exist in our records"
+        })
+        response.status_code = 400
+        return response
+    old_tokens = PasswordReset.query.filter_by(user_id=user.id).delete()
+    gen_token = generate_reset_token()
+    reset_token =  PasswordReset(user_id=user.id,reset_token=gen_token)
+    db.session.add(reset_token)
+    db.session.commit()
+    send_mail(user.email, 'You password reset token is: '+gen_token)
+    response = jsonify({
+        'status': 'ok',
+        'message': "Check your email to reset password"
+    })
+    response.status_code = 201
+    return response
 
 @API.route('/businesses', methods=['POST'])
 @auth
