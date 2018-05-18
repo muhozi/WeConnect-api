@@ -21,7 +21,7 @@ class ProductionConfig(Config):
     # SQLAlchemy Config
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
 
 
 class DevelopmentConfig(Config):

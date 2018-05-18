@@ -328,27 +328,27 @@ def get_all_businesses():
     businesses = Business.query
 
     # Filter by search query
-    if query is not None and query.strip() is not '':
+    if query is not None and query.strip() != '':
         businesses = businesses.filter(func.lower(Business.name).like('%'+ func.lower(query) +'%'))
 
     # Filter by category
-    if category is not None and category.strip() is not '':
+    if category is not None and category.strip() != '':
         businesses = businesses.filter(func.lower(Business.category) == func.lower(category))
 
     # Filter by city
-    if city is not None and city.strip() is not '':
+    if city is not None and city.strip() != '':
         businesses = businesses.filter(func.lower(Business.city) == func.lower(city))
 
     # Filter by country
-    if country is not None and country.strip() is not '':
+    if country is not None and country.strip() != '':
         businesses = businesses.filter(func.lower(Business.country) == func.lower(country))
-    
+
     errors = [] # Errors list
 
-    if per_page is not None and per_page.isdigit() is False and per_page.strip() is not '':
+    if per_page is not None and per_page.isdigit() is False and per_page.strip() != '':
         errors.append({'limit':'Invalid limit page limit number'})
 
-    if page is not None and page.isdigit() is False and page.strip() is not '':
+    if page is not None and page.isdigit() is False and page.strip() != '':
         errors.append({'page':'Invalid page number'})
 
     if len(errors) is not 0:
@@ -357,8 +357,8 @@ def get_all_businesses():
         response.status_code = 400
         return response
 
-    page = int(page) if page is not None and page.strip() is not '' else 1
-    per_page = int(per_page) if per_page is not None and per_page.strip() is not '' else 20
+    page = int(page) if page is not None and page.strip() != '' else 1
+    per_page = int(per_page) if per_page is not None and per_page.strip() != '' else 20
 
     # Overall filter results
     businesses = businesses.paginate(per_page=per_page, page=page)

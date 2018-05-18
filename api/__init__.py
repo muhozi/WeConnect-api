@@ -1,7 +1,7 @@
 """
      Initialize the app
 """
-from flask import Flask
+from flask import Flask, jsonify
 from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -50,12 +50,17 @@ TEMPLATE = {
     ],
     "operationId": "getmyData"
 }
+
+
 def create_app(config_name):
+    """
+        App init function
+    """
     app = Flask(__name__, instance_relative_config=True)
     # Register blueprint
     app.register_blueprint(API)
     # app.config.from_object(api_config[config_name])
     app.config.from_object(api_config[config_name])
     db.init_app(app)
-    SWAGGER = Swagger(app, config=SWAGGER_CONFIG, template=TEMPLATE)
+    Swagger(app, config=SWAGGER_CONFIG, template=TEMPLATE)
     return app
