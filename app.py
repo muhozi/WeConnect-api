@@ -12,7 +12,10 @@ migrate = Migrate(APP, db)
 
 
 @APP.errorhandler(404)
-def page_not_found(e):
+def page_not_found():
+    """
+        Return json error if page not found
+    """
     return jsonify({
         'status': 'error',
         'message': 'Page not found'

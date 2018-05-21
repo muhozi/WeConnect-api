@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from config import api_config
-
+from flask_cors import CORS
 db = SQLAlchemy()
 
 from api.api import API
@@ -59,7 +59,7 @@ def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
     # Register blueprint
     app.register_blueprint(API)
-    # app.config.from_object(api_config[config_name])
+    CORS(app, resources={r"/api/v1*": {"origins": "*"}})
     app.config.from_object(api_config[config_name])
     db.init_app(app)
     Swagger(app, config=SWAGGER_CONFIG, template=TEMPLATE)
