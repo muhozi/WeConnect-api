@@ -2,7 +2,8 @@
     Helper Methods
 """
 import secrets
-from flask_sendgrid import SendGrid
+from flask_mail import Message
+from api import mail
 from flask import current_app as app
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired, URLSafeSerializer)
@@ -33,6 +34,7 @@ def token_id(token):
         return False  # invalid token
     return data['id']
 
+
 def hashid(id_string):
     """
         Generate hashid
@@ -51,15 +53,16 @@ def get_id(id_string):
         return f_id[0]
     return None
 
+
 def generate_reset_token():
     return secrets.token_urlsafe(84)
 
+
 def send_mail(body, email):
-    print(app.config['SENDGRID_API_KEY'])
-    mail = SendGrid(app)
-    mail.send_email(
-        from_email='noreply@allconnect.heroku.com',
-        to_email=email,
-        subject='Reset password your password',
-        text=body,
-    )
+
+    msg = Message('Reset your account password',
+                  body=body,
+                  sender=('We Connect', 'noreply@allconnect.herokuapp.com'),
+                  recipients=[email],
+                  )
+    mail.send(msg)

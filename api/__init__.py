@@ -6,10 +6,12 @@ from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from config import api_config
+from flask_mail import Mail
 
 db = SQLAlchemy()
+# Init Flask mail
+mail = Mail()
 from api.api import API
-
 
 # Swagger configurations
 SWAGGER_CONFIG = {
@@ -54,6 +56,7 @@ def create_app(config_name):
     app.register_blueprint(API)
     # app.config.from_object(api_config[config_name])
     app.config.from_object(api_config[config_name])
+    mail.init_app(app)
     db.init_app(app)
     SWAGGER = Swagger(app, config=SWAGGER_CONFIG, template=TEMPLATE)
     return app
