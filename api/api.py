@@ -241,16 +241,17 @@ def reset_link():
     if user is None:
         response = jsonify({
             'status': 'error',
-            'message': "Email doesn't exist in our records"
+            'message': "Email doesn't exist"
         })
         response.status_code = 400
         return response
-    old_tokens = PasswordReset.query.filter_by(user_id=user.id).delete()
+    PasswordReset.query.filter_by(user_id=user.id).delete()
     gen_token = generate_reset_token()
     reset_token =  PasswordReset(user_id=user.id,reset_token=gen_token)
     db.session.add(reset_token)
     db.session.commit()
-    send_mail(user.email, 'You password reset token is: '+gen_token)
+    send_mail(user.email, '<h2>Hello ' + user.username +
+              ', </h2><br>You password reset token is: <b>'+gen_token+'</b>')
     response = jsonify({
         'status': 'ok',
         'message': "Check your email to reset password"

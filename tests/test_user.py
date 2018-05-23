@@ -3,12 +3,16 @@
 """
 from flask import json
 from tests.test_api import MainTests
+from api.models.password_reset import PasswordReset
+from api.helpers import generate_reset_token
+from api import db
 
 
 class UserTests(MainTests):
     """
         User features tests class
     """
+
     def test_registration(self):
         '''
             Testing registration
@@ -98,18 +102,98 @@ class UserTests(MainTests):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'You have successfully logged out', response.data)
 
+    def test_invalid_reset(self):
+        """
+            Testing reset password email with invalid input
+        """
+        response = self.app.post(self.url_prefix + 'auth/reset-password',
+                                 data=json.dumps({
+                                     'email': 'fdsfsfds'
+                                 }),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Please provide valid details', response.data)
+
+    def test_non_exist_reset(self):
+        """
+            Testing reset password email with invalid input
+        """
+        response = self.app.post(self.url_prefix + 'auth/reset-password',
+                                 data=json.dumps({
+                                     'email': 'anyemail@youremail.com'
+                                 }),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Email doesn\'t exist', response.data)
+    
     def test_password_reset(self):
         """
-            Testing reset password
+            Testing reset password email
         """
         response = self.app.post(self.url_prefix + 'auth/reset-password',
                                  data=json.dumps({
                                      'email': self.sample_user['email']
-                                     }),
+                                 }),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertIn(
             b'Check your email to reset password', response.data)
+
+    def test_password_reset(self):
+        """
+            Testing reset password with a token
+        """
+        gen_token = generate_reset_token()
+        token = PasswordReset(
+            user_id=self.sample_user['id'], reset_token=gen_token)
+        db.session.add(token)
+        db.session().commit()
+        response = self.app.post(self.url_prefix + 'auth/reset-password/'+gen_token,
+                                 data=json.dumps({
+                                     'email': self.sample_user['email'],
+                                     'password': 'awesome',
+                                     'confirm_password': 'awesome'
+                                 }),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(
+            b'You have successfully reset your password', response.data)
+
+    def test_inv_password_reset(self):
+        """
+            Testing reset password with a invalid token
+        """
+        response = self.app.post(self.url_prefix + 'auth/reset-password/dsaaq342',
+                                 data=json.dumps({
+                                     'email': self.sample_user['email'],
+                                     'password': 'awesome',
+                                     'confirm_password': 'awesome'
+                                 }),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Invalid reset token', response.data)
+
+    def test_inv_password_reset(self):
+        """
+            Testing reset password with a invalid input
+        """
+        gen_token = generate_reset_token()
+        token = PasswordReset(
+            user_id=self.sample_user['id'], reset_token=gen_token)
+        db.session.add(token)
+        db.session().commit()
+        response = self.app.post(self.url_prefix + 'auth/reset-password/'+gen_token,
+                                 data=json.dumps({
+                                     'email': self.sample_user['email'],
+                                     'password': 'awesome',
+                                 }),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Please provide valid details', response.data)
 
     def test_password_change(self):
         """
@@ -119,7 +203,7 @@ class UserTests(MainTests):
                                  data=json.dumps({
                                      'old_password': self.sample_user['password'],
                                      'new_password': '12345678'
-                                     }),
+                                 }),
                                  content_type='application/json',
                                  headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 201)
@@ -162,7 +246,8 @@ class UserTests(MainTests):
         # authorization token
         response = self.app.post(self.url_prefix + 'auth/change-password',
                                  data={
-                                     'old_password': self.sample_user['password'],  # Old password
+                                     # Old password
+                                     'old_password': self.sample_user['password'],
                                      'new_password': '123456'
                                  },
                                  headers={'Authorization': 'eyJhbGciOQxYI-vmeqW6'})
@@ -177,7 +262,8 @@ class UserTests(MainTests):
         # Test expired token by accessing protected endpoint with expired token
         response = self.app.post(self.url_prefix + 'auth/change-password',
                                  data={
-                                     'old_password': self.sample_user['password'],  # Old password
+                                     # Old password
+                                     'old_password': self.sample_user['password'],
                                      'new_password': '123456'
                                  },
                                  headers={'Authorization': self.expired_test_token})
@@ -189,7 +275,7 @@ class UserTests(MainTests):
         """
             Testing Bad signature token
         """
-        #Access protected endpoint with bad signature token
+        # Access protected endpoint with bad signature token
         response = self.app.get(self.url_prefix + 'account/businesses',
                                 headers={'Authorization': self.other_signature_token})
         self.assertEqual(response.status_code, 401)

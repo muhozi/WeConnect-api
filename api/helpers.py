@@ -58,11 +58,11 @@ def generate_reset_token():
     return secrets.token_urlsafe(84)
 
 
-def send_mail(body, email):
+def send_mail(email, body):
 
-    msg = Message('Reset your account password',
-                  body=body,
-                  sender=('We Connect', 'noreply@allconnect.herokuapp.com'),
+    msg = Message('Reset your account password on WeConnect',
+                  sender=('We Connect','noreply@allconnect.herokuapp.com'),
                   recipients=[email],
                   )
+    msg.html = body
     mail.send(msg)
