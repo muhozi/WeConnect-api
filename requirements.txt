@@ -18,7 +18,6 @@ Flask==0.12.2
 Flask-Cors==3.0.4
 Flask-Mail==0.9.1
 Flask-Migrate==2.1.1
-Flask-SendGrid==0.6
 Flask-SQLAlchemy==2.3.2
 future==0.16.0
 hashids==1.2.0
