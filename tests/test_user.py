@@ -128,7 +128,7 @@ class UserTests(MainTests):
         self.assertIn(
             b'Email doesn\'t exist', response.data)
     
-    def test_password_reset(self):
+    def test_email_password_reset(self):
         """
             Testing reset password email
         """

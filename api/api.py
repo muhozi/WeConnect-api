@@ -250,6 +250,7 @@ def reset_link():
     reset_token =  PasswordReset(user_id=user.id,reset_token=gen_token)
     db.session.add(reset_token)
     db.session.commit()
+    print("OK Email is running *********************************")
     send_mail(user.email, '<h2>Hello ' + user.username +
               ', </h2><br>You password reset token is: <b>'+gen_token+'</b>')
     response = jsonify({
