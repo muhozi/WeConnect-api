@@ -4,14 +4,15 @@
 from flask import Flask, jsonify
 from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from dotenv import load_dotenv
 from config import api_config
 from flask_cors import CORS
+from flask_mail import Mail
+
 db = SQLAlchemy()
-
+# Init Flask mail
+mail = Mail()
 from api.api import API
-
 
 # Swagger configurations
 SWAGGER_CONFIG = {
@@ -61,6 +62,7 @@ def create_app(config_name):
     app.register_blueprint(API)
     CORS(app, resources={r"/api/v1*": {"origins": "*"}})
     app.config.from_object(api_config[config_name])
+    mail.init_app(app)
     db.init_app(app)
     Swagger(app, config=SWAGGER_CONFIG, template=TEMPLATE)
     return app

@@ -13,11 +13,17 @@ class Config():
     JSON_SORT_KEYS = False
     # Configs loaded from env
     SECRET_KEY = os.getenv('SECRET_KEY')
+    MAIL_SERVER = os.getenv('MAIL_SERVER')
+    MAIL_PORT = os.getenv('MAIL_PORT')
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.getenv('noreply@allconnect.herokuapp.com')
 
 
 class ProductionConfig(Config):
     DEVELOPMENT = False
     DEBUG = False
+    TESTING = False
     # SQLAlchemy Config
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -27,6 +33,7 @@ class ProductionConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+    TESTING = True
     # SQLAlchemy Config
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False

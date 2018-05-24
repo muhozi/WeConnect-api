@@ -1,9 +1,12 @@
 """
     Helper Methods
 """
+import secrets
+from flask_mail import Message
+from api import mail
 from flask import current_app as app
 from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
+                          as Serializer, BadSignature, SignatureExpired, URLSafeSerializer)
 from hashids import Hashids
 
 
@@ -31,6 +34,7 @@ def token_id(token):
         return False  # invalid token
     return data['id']
 
+
 def hashid(id_string):
     """
         Generate hashid
@@ -48,3 +52,18 @@ def get_id(id_string):
     if len(f_id) is not 0:
         return f_id[0]
     return None
+
+
+def generate_reset_token():
+    return secrets.token_urlsafe(84)
+
+
+def send_mail(email, body):
+
+    msg = Message('Reset your account password on WeConnect',
+                  sender=('We Connect','noreply@allconnect.herokuapp.com'),
+                  recipients=[email],
+                  )
+    print("OK Email is running *********************************")
+    msg.html = body
+    mail.send(msg)
