@@ -161,7 +161,7 @@ class UserTests(MainTests):
         self.assertIn(
             b'You have successfully reset your password', response.data)
 
-    def test_inv_password_reset(self):
+    def test_inv_reset_tok(self):
         """
             Testing reset password with a invalid token
         """
