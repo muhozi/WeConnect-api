@@ -1,5 +1,5 @@
 """ User Model """
-from api import db
+from api.models import db
 from api.helpers import hashid, get_id
 
 
@@ -30,7 +30,7 @@ class Business(db.Model):
     def get(cls, business_id):
         """
             Get business by hashid
-        """ 
+        """
         found_id = get_id(business_id)
         if found_id is not None:
             return cls.query.get(found_id)
@@ -85,7 +85,7 @@ class Business(db.Model):
     @classmethod
     def has_two_same_business(cls, user_id, business_name, business_id):
         """ Check if the user has the two same busines name #nt from the one to update"""
-        if cls.query.filter(cls.user_id==user_id, cls.name == business_name, cls.id != get_id(business_id)).first() is not None:
+        if cls.query.filter(cls.user_id == user_id, cls.name == business_name, cls.id != get_id(business_id)).first() is not None:
             return True
         return False
 
@@ -99,4 +99,29 @@ class Business(db.Model):
         business.city = data['city']
         business.country = data['country']
         db.session.add(business)
+        db.session.commit()
+
+    @classmethod
+    def save(cls, data):
+        """
+            Save method
+        """
+        business = cls(
+            user_id=data['user_id'],
+            name=data['name'],
+            description=data['description'],
+            category=data['category'],
+            country=data['country'],
+            city=data['city']
+        )
+        db.session.add(business)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, business_id):
+        """
+            Delete method
+        """
+        business = cls.query.get(business_id)
+        db.session.delete(business)
         db.session.commit()

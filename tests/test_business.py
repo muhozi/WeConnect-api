@@ -3,7 +3,7 @@
 """
 from flask import json
 from tests.test_api import MainTests
-from api import db
+from api.models import db
 from api.models.business import Business
 
 
@@ -48,7 +48,7 @@ class BusinessTests(MainTests):
             'user_id': self.sample_user['id'],
             'name': self.rev_business_data['name'],
             'description': self.rev_business_data['description'],
-            'category':self.rev_business_data['category'],
+            'category': self.rev_business_data['category'],
             'country': self.rev_business_data['country'],
             'city': self.rev_business_data['city'],
         }), headers={'Authorization': self.test_token})
@@ -91,7 +91,6 @@ class BusinessTests(MainTests):
         response = self.app.delete(self.url_prefix + 'businesses/' +
                                    self.business_data['hashid'],
                                    data={}, headers={'Authorization': self.orphan_token})
-        print(response)
         self.assertEqual(response.status_code, 400)
 
     def test_business_update(self):
@@ -159,7 +158,7 @@ class BusinessTests(MainTests):
         )
         db.session.add(business)
         db.session.commit()
-        response = self.app.put(self.url_prefix + 'businesses/' +self.business_data['hashid'],
+        response = self.app.put(self.url_prefix + 'businesses/' + self.business_data['hashid'],
                                 data=json.dumps(new_business_data),
                                 headers={'Authorization': self.test_token},
                                 content_type='application/json')
@@ -216,11 +215,11 @@ class BusinessTests(MainTests):
         self.business_data['user_id'] = self.sample_user['id']
         # Save businesses to test
         response = self.app.get(
-            self.url_prefix + 'businesses?q='+self.business_data['name']+
-            '&country='+self.business_data['country']+
-            '&city='+self.business_data['city']+
-            '&category='+self.business_data['category']+
-            '&limit='+'1'+
+            self.url_prefix + 'businesses?q='+self.business_data['name'] +
+            '&country='+self.business_data['country'] +
+            '&city='+self.business_data['city'] +
+            '&category='+self.business_data['category'] +
+            '&limit='+'1' +
             '&page=1'
         )
         self.assertEqual(response.status_code, 200)
@@ -236,8 +235,8 @@ class BusinessTests(MainTests):
         self.business_data['user_id'] = self.sample_user['id']
         # Save businesses to test
         response = self.app.get(
-            self.url_prefix + 'businesses?'+
-            'limit='+'notInt'+
+            self.url_prefix + 'businesses?' +
+            'limit='+'notInt' +
             '&page=notInt'
         )
         self.assertEqual(response.status_code, 400)
@@ -257,7 +256,6 @@ class BusinessTests(MainTests):
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             b'businesses found', response.data)
-
 
     def test_empty_businesses(self):
         '''

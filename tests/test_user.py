@@ -5,7 +5,7 @@ from flask import json
 from tests.test_api import MainTests
 from api.models.password_reset import PasswordReset
 from api.helpers import generate_reset_token
-from api import db
+from api.models import db
 
 
 class UserTests(MainTests):
@@ -127,7 +127,7 @@ class UserTests(MainTests):
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'Email doesn\'t exist', response.data)
-    
+
     def test_email_password_reset(self):
         """
             Testing reset password email

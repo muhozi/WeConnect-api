@@ -1,5 +1,7 @@
 """ User Model """
-from api import db
+from werkzeug.security import generate_password_hash
+from api.models import db
+
 
 
 class User(db.Model):
@@ -18,7 +20,30 @@ class User(db.Model):
     ), server_onupdate=db.func.now(), nullable=False)
 
     @classmethod
+    def save(cls, user):
+        """
+            Save user
+        """
+        save_user = cls(
+            username=user['username'],
+            email=user['email'],
+            password=generate_password_hash(user['password'])
+        )
+        db.session.add(save_user)
+        db.session.commit()
+
+    @classmethod
     def get_user(cls, email):
         """Check if user exists and return user details"""
         user = User.query.filter_by(email=email).first()
         return user
+
+    @classmethod
+    def update_password(cls, user_id, password):
+        """
+            Update password
+        """
+        user = cls.query.get(user_id)
+        user.password = generate_password_hash(password)
+        db.session.add(user)
+        db.session.commit()

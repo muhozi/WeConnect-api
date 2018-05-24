@@ -8,7 +8,7 @@ from api.models.user import User
 from api.models.token import Token
 from api.models.business import Business
 from api.helpers import get_token
-from api import db
+from api.models import db
 
 
 class MainTests(unittest.TestCase):

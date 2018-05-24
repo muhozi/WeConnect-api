@@ -64,6 +64,5 @@ def send_mail(email, body):
                   sender=('We Connect','noreply@allconnect.herokuapp.com'),
                   recipients=[email],
                   )
-    print("OK Email is running *********************************")
     msg.html = body
     mail.send(msg)

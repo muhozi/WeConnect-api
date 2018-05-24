@@ -3,16 +3,17 @@
 """
 from flask import Flask, jsonify
 from flasgger import Swagger
-from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-from config import api_config
 from flask_cors import CORS
 from flask_mail import Mail
-
-db = SQLAlchemy()
+from config import api_config
+from api.models import db
 # Init Flask mail
 mail = Mail()
-from api.api import API
+from api.views.user import USER
+from api.views.business import BUSINESS
+from api.views.review import REVIEW
+# from api.api import API
 
 # Swagger configurations
 SWAGGER_CONFIG = {
@@ -59,7 +60,10 @@ def create_app(config_name):
     """
     app = Flask(__name__, instance_relative_config=True)
     # Register blueprint
-    app.register_blueprint(API)
+    prefix = '/api/v1/'
+    app.register_blueprint(USER, url_prefix=prefix)
+    app.register_blueprint(BUSINESS, url_prefix=prefix+'businesses')
+    app.register_blueprint(REVIEW, url_prefix=prefix)
     CORS(app, resources={r"/api/v1*": {"origins": "*"}})
     app.config.from_object(api_config[config_name])
     mail.init_app(app)

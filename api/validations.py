@@ -49,7 +49,6 @@ class Validations():
     def same(self, key, same):
         """Check if given """
         if key in self.all and same in self.all:
-            # print(self.all[key]+self.all[key])
             if self.all[same] != self.all[key]:
                 return same + " don't match"
             return True

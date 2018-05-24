@@ -1,5 +1,5 @@
 """ Access tokens Model """
-from api import db
+from api.models import db
 
 
 class Token(db.Model):
@@ -16,3 +16,24 @@ class Token(db.Model):
         db.DateTime, default=db.func.now(), nullable=False)
     updated_at = db.Column(db.DateTime, default=db.func.now(),
                            server_onupdate=db.func.now(), nullable=False)
+
+    @classmethod
+    def save(cls, data):
+        """
+            Save access token
+        """
+        token = cls(
+            user_id=data['user_id'],
+            access_token=['token'],
+        )
+        db.session.add(token)
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, token_id):
+        """
+            Delete token
+        """
+        token = Token.query.get(token_id)
+        db.session.delete(token)
+        db.session.commit()

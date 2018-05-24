@@ -4,16 +4,13 @@
 from flask import json
 from tests.test_api import MainTests
 from api.models.review import Review
-from api import db
+from api.models import db
 
 
 class ReviewTests(MainTests):
     """
         Review tests
     """
-    # def __init__(self,arg):
-    #     self.add_business()
-
     def test_add_business_review(self):
         '''
             Test adding business review

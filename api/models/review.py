@@ -1,5 +1,5 @@
 """ User Model """
-from api import db
+from api.models import db
 from api.helpers import hashid
 
 
@@ -19,6 +19,19 @@ class Review(db.Model):
                            server_onupdate=db.func.now(), nullable=False)
 
     @classmethod
+    def save(cls, data):
+        """
+            Save method
+        """
+        review = cls(
+            user_id=data['user_id'],
+            description=data['description'],
+            business_id=data['business_id']
+        )
+        db.session.add(review)
+        db.session.commit()
+
+    @classmethod
     def serializer(cls, datum):
         """ Serialize model object array (Convert into a list) """
         results = []
@@ -31,3 +44,10 @@ class Review(db.Model):
             }
             results.append(obj)
         return results
+
+    @classmethod
+    def delete_all(cls, business_id):
+        """
+            Delete All reviews about business
+        """
+        cls.query.filter_by(business_id=business_id).delete()
