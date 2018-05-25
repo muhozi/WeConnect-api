@@ -141,7 +141,8 @@ def change_password():
         })
         response.status_code = 400
         return response
-    User.update_password(user.id, sent_data['new_password'])
+    User.update_password(
+        user.id, generate_password_hash(sent_data['new_password']))
     response = jsonify({
         'status': 'ok',
         'message': "You have successfully changed your password"

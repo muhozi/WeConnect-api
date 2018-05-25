@@ -61,6 +61,7 @@ def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
     # Register blueprint
     prefix = '/api/v1/'
+    # Register blueprints
     app.register_blueprint(USER, url_prefix=prefix)
     app.register_blueprint(BUSINESS, url_prefix=prefix+'businesses')
     app.register_blueprint(REVIEW, url_prefix=prefix)

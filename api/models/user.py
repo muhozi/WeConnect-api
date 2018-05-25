@@ -1,5 +1,4 @@
 """ User Model """
-from werkzeug.security import generate_password_hash
 from api.models import db
 
 
@@ -27,7 +26,7 @@ class User(db.Model):
         save_user = cls(
             username=user['username'],
             email=user['email'],
-            password=generate_password_hash(user['password'])
+            password=user['password']
         )
         db.session.add(save_user)
         db.session.commit()
@@ -44,6 +43,6 @@ class User(db.Model):
             Update password
         """
         user = cls.query.get(user_id)
-        user.password = generate_password_hash(password)
+        user.password = password
         db.session.add(user)
         db.session.commit()
