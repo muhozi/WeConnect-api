@@ -24,7 +24,7 @@ class Token(db.Model):
         """
         token = cls(
             user_id=data['user_id'],
-            access_token=['token'],
+            access_token=data['access_token'],
         )
         db.session.add(token)
         db.session.commit()
