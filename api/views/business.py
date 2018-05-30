@@ -35,7 +35,7 @@ def register_business():
         response.status_code = 400
         return response
     user_id = token_id(request.headers.get('Authorization'))
-    if Business.query.filter_by(user_id=user_id, name=sent_data['name']).first() is not None:
+    if Business.query.filter(Business.user_id==user_id, func.lower(Business.name)==func.lower(sent_data['name'])).first() is not None:
         response = jsonify(
             status='error', message="You have already a registered business with the same name")
         response.status_code = 400

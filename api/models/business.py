@@ -1,4 +1,5 @@
 """ User Model """
+from sqlalchemy import func
 from api.models import db
 from api.helpers import hashid, get_id
 
@@ -85,7 +86,9 @@ class Business(db.Model):
     @classmethod
     def has_two_same_business(cls, user_id, business_name, business_id):
         """ Check if the user has the two same busines name #nt from the one to update"""
-        if cls.query.filter(cls.user_id == user_id, cls.name == business_name, cls.id != get_id(business_id)).first() is not None:
+        if cls.query.filter(cls.user_id == user_id, func.lower(
+                cls.name) == func.lower(business_name),
+                cls.id != get_id(business_id)).first() is not None:
             return True
         return False
 

@@ -57,7 +57,7 @@ class Validations():
     def required(self, key, is_required=True):
         """Check input it is required"""
         if key in self.all:
-            if self.all[key] is None:
+            if self.all[key] is None or self.all[key].strip() == '':
                 return key + " should not be empty"
             return True
         return key + " is required"
