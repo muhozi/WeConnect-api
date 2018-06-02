@@ -23,14 +23,14 @@ class Validations():
         if key in self.all and self.all[key] is not None:
             if not re.match(r"[^[a-zA-Z0-9]+$", self.all[key]):
                 return True
-            return key + " should be string"
+            return key.capitalize() + " should be string"
         return True
 
     def minimum(self, key, minimum):
         """Check required character size"""
         if key in self.all and self.all[key] is not None:
             if len(self.all[key]) < int(minimum):
-                return key + " should not be less than " + str(minimum) + " characters"
+                return key.capitalize() + " should not be less than " + str(minimum) + " characters"
             return True
         return True
 
@@ -38,7 +38,7 @@ class Validations():
         """Check required character size"""
         if key in self.all and self.all[key] is not None:
             if len(self.all[key]) > int(maximum):
-                return key + " should not be greater than " + str(maximum) + " characters"
+                return key.capitalize() + " should not be greater than " + str(maximum) + " characters"
             return True
         return True
 
@@ -62,9 +62,9 @@ class Validations():
         """Check input it is required"""
         if key in self.all:
             if self.all[key] is None or self.all[key].strip() == '':
-                return key + " should not be empty"
+                return key.capitalize() + " should not be empty"
             return True
-        return key + " is required"
+        return key.capitalize() + " is required"
 
     def unique(self, key, tableRow):
         """Check if value is unique"""
