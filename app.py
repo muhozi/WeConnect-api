@@ -11,7 +11,7 @@ migrate = Migrate(APP, db)
 
 
 @APP.errorhandler(404)
-def page_not_found(e):
+def not_found(error):
     """
         Return json error if page not found
     """
@@ -21,9 +21,33 @@ def page_not_found(e):
     }), 404
 
 
+@APP.errorhandler(400)
+def bad_request(e):
+    """
+        Bad request json response
+    """
+    return jsonify({
+        'status': 'error',
+        'message': 'Bad request'
+    }), 400
+
+
+@APP.errorhandler(500)
+def internal_server_error(e):
+    """
+        Bad request json response
+    """
+    return jsonify({
+        'status': 'error',
+        'message': 'Something went wrong at our end'
+    }), 500
+
+
 @APP.route('/')
-def helapi_docslo():
+def api_docs_redirect():
+    """ Redirect to API docs """
     return redirect('/api/v1', code=302)
+
 
 if __name__ == '__main__':
     # Run the application

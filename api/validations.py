@@ -12,6 +12,12 @@ class Validations():
 
     def __init__(self, all_inputs):
         """ All inputs dictionary should be available to the class"""
+        print(all_inputs)
+        for key, value in all_inputs.items():
+            if all_inputs[key] is not None and not isinstance(all_inputs[key], int):
+                if all_inputs[key].strip() is '':
+                    all_inputs[key] = None
+        print(all_inputs)
         self.all = all_inputs
 
     def string(self, key, string):
@@ -40,7 +46,7 @@ class Validations():
 
     def email(self, key, email):
         """Check required character size"""
-        if key in self.all:
+        if key in self.all and self.all[key] is not None:
             if not re.match(r"[^@\s]+@[^@\s]+\.[a-zA-Z]+$", self.all[key]):
                 return "Invalid email address"
             return True
