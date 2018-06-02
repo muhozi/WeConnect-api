@@ -12,12 +12,10 @@ class Validations():
 
     def __init__(self, all_inputs):
         """ All inputs dictionary should be available to the class"""
-        print(all_inputs)
         for key, value in all_inputs.items():
             if all_inputs[key] is not None and not isinstance(all_inputs[key], int):
                 if all_inputs[key].strip() is '':
                     all_inputs[key] = None
-        print(all_inputs)
         self.all = all_inputs
 
     def string(self, key, string):
