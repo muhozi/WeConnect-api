@@ -99,6 +99,7 @@ def login():
                 'status': 'ok',
                 'message': 'You have been successfully logged in',
                 'access_token': token_,
+                'user': {'username':logged_user.username,'email':logged_user.email}
             })
             response.status_code = 200
             # response.headers['auth_token'] = token
