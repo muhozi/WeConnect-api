@@ -104,6 +104,6 @@ class ReviewTests(MainTests):
                                  data=json.dumps({
                                      'review': 'We enjoy your coffee',
                                  }), headers={'Authorization': self.test_token})
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
         self.assertIn(
             b'business doesn\'t exist', response.data)
