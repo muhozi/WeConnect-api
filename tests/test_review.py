@@ -67,7 +67,7 @@ class ReviewTests(MainTests):
         '''
         response = self.app.get(
             self.url_prefix + 'businesses/any_dummy_id/reviews')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
         self.assertIn(
             b'This business doesn\'t exist', response.data)
 
@@ -104,6 +104,6 @@ class ReviewTests(MainTests):
                                  data=json.dumps({
                                      'review': 'We enjoy your coffee',
                                  }), headers={'Authorization': self.test_token})
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'business doesn\'t exist', response.data)
