@@ -82,5 +82,5 @@ def get_business_reviews(business_id):
         'status': 'error',
         'message': "This business doesn't exist"
     })
-    response.status_code = 400
+    response.status_code = 404
     return response
