@@ -1,5 +1,6 @@
 """ User Model """
 from api.models import db
+from api.models.user import User
 from api.helpers import hashid
 
 
@@ -38,7 +39,7 @@ class Review(db.Model):
         for data in datum:
             obj = {
                 'id': hashid(data.id),
-                'user_id': hashid(data.user_id),
+                'user': User.query.get(data.user_id).username,
                 'description': data.description,
                 'created_at': data.created_at,
             }

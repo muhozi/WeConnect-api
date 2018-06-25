@@ -846,9 +846,9 @@ BUSINESS_REVIEWS_DOCS = {
                                     "type": "string",
                                     "example": "c9918c47a9a74a56af54ce44a6d60e2d"
                                 },
-                                "user_id": {
+                                "user": {
                                     "type": "string",
-                                    "example": "fab15b5ee8c245d9bf1f22972f77ebbe"
+                                    "example": "emery"
                                 },
                                 "review": {
                                     "type": "string",
