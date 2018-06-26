@@ -486,6 +486,60 @@ GET_BUSINESSES_DOCS = {
                 "format": "uuid",
             },
             "required": True,
+        },
+        {
+            "name": "q",
+            "in": "query",
+            "description": "Query string to search business",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by category",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "country",
+            "in": "query",
+            "description": "Filter by country",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "city",
+            "in": "query",
+            "description": "Filter by city",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "limit",
+            "in": "query",
+            "description": "Businesses limit per page",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
         }
     ],
     "responses": {
