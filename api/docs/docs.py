@@ -534,6 +534,14 @@ GET_BUSINESSES_DOCS = {
                                     "type": "string",
                                     "example": "Kigali"
                                 },
+                                "reviews_count": {
+                                    "type": "string",
+                                    "example": "1"
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "example": "Thu, 24 May 2018 19:14:36 GMT"
+                                },
                             }
                         }
                     },
@@ -650,6 +658,14 @@ GET_ALL_BUSINESSES_DOCS = {
                                     "type": "string",
                                     "example": "Kigali"
                                 },
+                                "reviews_count": {
+                                    "type": "string",
+                                    "example": "1"
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "example": "Thu, 24 May 2018 19:14:36 GMT"
+                                },
                             }
                         }
                     },
@@ -721,6 +737,14 @@ GET_BUSINESS_DOCS = {
                                 "city": {
                                     "type": "string",
                                     "example": "Kigali"
+                                },
+                                "reviews_count": {
+                                    "type": "string",
+                                    "example": "1"
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "example": "Thu, 24 May 2018 19:14:36 GMT"
                                 },
                             }
                         }
@@ -835,6 +859,14 @@ BUSINESS_REVIEWS_DOCS = {
                                     "type": "string",
                                     "example": "Kigali"
                                 },
+                                "reviews_count": {
+                                    "type": "string",
+                                    "example": "1"
+                                },
+                                "created_at": {
+                                    "type": "string",
+                                    "example": "Thu, 24 May 2018 19:14:36 GMT"
+                                },
                             }
                         }
                     },
@@ -850,7 +882,7 @@ BUSINESS_REVIEWS_DOCS = {
                                     "type": "string",
                                     "example": "emery"
                                 },
-                                "review": {
+                                "description": {
                                     "type": "string",
                                     "example": "You have best coffee"
                                 },

@@ -1,11 +1,12 @@
 """ User Model """
 from sqlalchemy import func
 from api.models import db
+from api.models.review import Review
 from api.helpers import hashid, get_id
 
 
 class Business(db.Model):
-    """Users Model"""
+    """Business Model"""
 
     __tablename__ = "businesses"
 
@@ -51,6 +52,7 @@ class Business(db.Model):
                 'category': data.category,
                 'country': data.country,
                 'city': data.city,
+                'reviews_count': Review.query.filter_by(business_id=data.id).count(),
                 'created_at': data.created_at,
             }
             results.append(obj)
@@ -73,6 +75,7 @@ class Business(db.Model):
             'description': data.description,
             'country': data.country,
             'city': data.city,
+            'reviews_count': Review.query.filter_by(business_id=data.id).count(),
             'created_at': data.created_at,
         }
 

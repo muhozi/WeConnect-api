@@ -1,11 +1,11 @@
-""" User Model """
+""" Review Model """
 from api.models import db
 from api.models.user import User
 from api.helpers import hashid
 
 
 class Review(db.Model):
-    """Users Model"""
+    """Review Model"""
 
     __tablename__ = "reviews"
 
@@ -39,7 +39,7 @@ class Review(db.Model):
         for data in datum:
             obj = {
                 'id': hashid(data.id),
-                'user': User.query.get(data.user_id).username,
+                'user': User.query.get(data.user_id).username.capitalize(),
                 'description': data.description,
                 'created_at': data.created_at,
             }
