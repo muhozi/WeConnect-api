@@ -4,6 +4,7 @@
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flasgger.utils import swag_from
+from sqlalchemy import func
 from api.models.user import User
 from api.models.business import Business
 from api.models.token import Token
@@ -228,15 +229,72 @@ def get_user_businesses():
         User's Businesses list
     """
     user_id = token_id(request.headers.get('Authorization'))
-    businesses = Business.user_businesses(user_id)
-    if len(businesses) is not 0:
-        response = jsonify({
-            'status': 'ok',
-            'message': 'You have businesses ' + str(len(businesses)) + ' registered businesses',
-            'businesses': Business.serializer(businesses)
-        })
+    query = request.args.get('q')
+    category = request.args.get('category')
+    city = request.args.get('city')
+    country = request.args.get('country')
+    page = request.args.get('page')
+    per_page = request.args.get('limit')
+    businesses = Business.query.filter_by(user_id=user_id)
+    if businesses.count() is not 0:
+
+        # Filter by search query
+        if query is not None and query.strip() != '':
+            businesses = businesses.filter(func.lower(
+                Business.name).like('%' + func.lower(query) + '%'))
+
+        # Filter by category
+        if category is not None and category.strip() != '':
+            businesses = businesses.filter(func.lower(
+                Business.category) == func.lower(category))
+
+        # Filter by city
+        if city is not None and city.strip() != '':
+            businesses = businesses.filter(
+                func.lower(Business.city) == func.lower(city))
+
+        # Filter by country
+        if country is not None and country.strip() != '':
+            businesses = businesses.filter(func.lower(
+                Business.country) == func.lower(country))
+
+        errors = []  # Errors list
+
+        if per_page is not None and per_page.isdigit() is False and per_page.strip() != '':
+            errors.append({'limit': 'Invalid limit page limit number'})
+
+        if page is not None and page.isdigit() is False and page.strip() != '':
+            errors.append({'page': 'Invalid page number'})
+
+        if len(errors) is not 0:
+            response = jsonify(
+                status='error', message="Please provide valid details", errors=errors)
+            response.status_code = 400
+            return response
+
+        page = int(page) if page is not None and page.strip() != '' else 1
+        per_page = int(
+            per_page) if per_page is not None and per_page.strip() != '' else 20
+
+        # Overall filter results
+        businesses = businesses.paginate(per_page=per_page, page=page)
+
+        if len(Business.serializer(businesses.items)) is not 0:
+            response = jsonify({
+                'status': 'ok',
+                'message': 'There are ' + str(len(businesses.items)) + ' businesses found',
+                'next_page': businesses.next_num,
+                'previous_page': businesses.prev_num,
+                'total_businesses': businesses.total,
+                'businesses': Business.serializer(businesses.items)
+            })
+            response.status_code = 200
+            return response
+        response = jsonify(
+            status='error', message="No business found!")
         response.status_code = 200
         return response
+
     response = jsonify(
         status='error', message="You don't have registered any business")
     response.status_code = 200

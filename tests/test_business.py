@@ -12,7 +12,7 @@ class BusinessTests(MainTests):
         Business tests class
     """
 
-    def test_empty_businesses(self):
+    def test_no_businesses(self):
         '''
             Test retrieving businesses with none registered
         '''
@@ -194,7 +194,7 @@ class BusinessTests(MainTests):
         self.assertIn(
             b'You don\'t have registered any business', response.data)
 
-    def test_businesses(self):
+    def test_user_businesses(self):
         '''
             Test retrieving logged in user business
         '''
@@ -203,8 +203,43 @@ class BusinessTests(MainTests):
         self.business_data['user_id'] = self.sample_user['id']
         # Save businesses to test
         response = self.app.get(
-            self.url_prefix + 'account/businesses', headers={'Authorization': self.test_token})
+            self.url_prefix + 'account/businesses?q='+self.business_data['name'] +
+            '&country='+self.business_data['country'] +
+            '&city='+self.business_data['city'] +
+            '&category='+self.business_data['category'] +
+            '&limit=1' +
+            '&page=1', headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 200)
+    
+    def test_user_businesses_search(self):
+        '''
+            Test bad search logged in user business
+        '''
+        self.add_business()
+        # Add user(owner) to the business data dict
+        self.business_data['user_id'] = self.sample_user['id']
+        # Save businesses to test
+        response = self.app.get(
+            self.url_prefix + 'account/businesses?q='+self.business_data['name'] +
+            '&country=unknownCountry_g', headers={'Authorization': self.test_token})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'No business found', response.data)
+
+    def test_acc_bad_params_businesses(self):
+        '''
+            Test invalid search of logged in user business
+        '''
+        self.add_business()
+        # Add user(owner) to the business data dict
+        self.business_data['user_id'] = self.sample_user['id']
+        # Save businesses to test
+        response = self.app.get(
+            self.url_prefix + 'account/businesses?&limit=' +
+            '&page=notInt', headers={'Authorization': self.test_token})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Please provide valid details', response.data)
 
     def test_search_filters(self):
         '''

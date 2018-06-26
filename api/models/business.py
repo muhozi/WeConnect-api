@@ -80,13 +80,6 @@ class Business(db.Model):
         }
 
     @classmethod
-    def user_businesses(cls, user_id):
-        """ Retrieve user's businesses"""
-        businesses = cls.query.filter_by(user_id=user_id).all()
-        if businesses is not None:
-            return businesses
-
-    @classmethod
     def has_two_same_business(cls, user_id, business_name, business_id):
         """ Check if the user has the two same busines name #nt from the one to update"""
         if cls.query.filter(cls.user_id == user_id, func.lower(
