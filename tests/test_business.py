@@ -192,7 +192,7 @@ class BusinessTests(MainTests):
         response = self.app.get(
             self.url_prefix + 'account/businesses', headers={'Authorization': self.orphan_token})
         self.assertIn(
-            b'You don\'t have registered any business', response.data)
+            b'You don\'t have any registered business', response.data)
 
     def test_user_businesses(self):
         '''
@@ -210,7 +210,7 @@ class BusinessTests(MainTests):
             '&limit=1' +
             '&page=1', headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 200)
-    
+
     def test_user_businesses_search(self):
         '''
             Test bad search logged in user business

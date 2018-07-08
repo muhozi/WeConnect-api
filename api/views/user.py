@@ -100,7 +100,7 @@ def login():
                 'status': 'ok',
                 'message': 'You have been successfully logged in',
                 'access_token': token_,
-                'user': {'username':logged_user.username,'email':logged_user.email}
+                'user': {'username': logged_user.username, 'email': logged_user.email}
             })
             response.status_code = 200
             # response.headers['auth_token'] = token
@@ -285,6 +285,8 @@ def get_user_businesses():
                 'message': 'There are ' + str(len(businesses.items)) + ' businesses found',
                 'next_page': businesses.next_num,
                 'previous_page': businesses.prev_num,
+                'current_page': businesses.page,
+                'pages': businesses.pages,
                 'total_businesses': businesses.total,
                 'businesses': Business.serializer(businesses.items)
             })
@@ -296,6 +298,6 @@ def get_user_businesses():
         return response
 
     response = jsonify(
-        status='error', message="You don't have registered any business")
+        status='error', message="You don't have any registered business")
     response.status_code = 200
     return response

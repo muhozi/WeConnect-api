@@ -187,6 +187,8 @@ def get_all_businesses():
             'message': 'There are ' + str(len(businesses.items)) + ' businesses found',
             'next_page': businesses.next_num,
             'previous_page': businesses.prev_num,
+            'current_page': businesses.page,
+            'pages': businesses.pages,
             'total_businesses': businesses.total,
             'businesses': Business.serializer(businesses.items)
         })
