@@ -3,6 +3,7 @@
 """
 from flask import Blueprint, jsonify, request
 from flasgger.utils import swag_from
+from sqlalchemy import desc
 from api.models.business import Business
 from api.models.review import Review
 from api.docs.docs import (ADD_BUSINESS_REVIEW_DOCS,
@@ -59,7 +60,7 @@ def get_business_reviews(business_id):
     """
     business = Business.get(business_id)
     if business is not None:
-        reviews = Review.query.filter_by(
+        reviews = Review.query.order_by(desc(Review.created_at)).filter_by(
             business_id=Business.get(business_id).id).all()
         if len(reviews) is not 0:
             response = jsonify({

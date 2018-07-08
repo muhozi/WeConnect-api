@@ -4,7 +4,7 @@
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flasgger.utils import swag_from
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from api.models.user import User
 from api.models.business import Business
 from api.models.token import Token
@@ -235,7 +235,8 @@ def get_user_businesses():
     country = request.args.get('country')
     page = request.args.get('page')
     per_page = request.args.get('limit')
-    businesses = Business.query.filter_by(user_id=user_id)
+    businesses = Business.query.order_by(
+        desc(Business.created_at)).filter_by(user_id=user_id)
     if businesses.count() is not 0:
 
         # Filter by search query

@@ -2,7 +2,7 @@
     Business features routes
 """
 from flask import Blueprint, jsonify, request
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from flasgger.utils import swag_from
 from api.models.business import Business
 from api.models.review import Review
@@ -35,7 +35,7 @@ def register_business():
         response.status_code = 400
         return response
     user_id = token_id(request.headers.get('Authorization'))
-    if Business.query.filter(Business.user_id==user_id, func.lower(Business.name)==func.lower(sent_data['name'])).first() is not None:
+    if Business.query.order_by(desc(Business.created_at)).filter(Business.user_id == user_id, func.lower(Business.name) == func.lower(sent_data['name'])).first() is not None:
         response = jsonify(
             status='error', message="You have already a registered business with the same name")
         response.status_code = 400
@@ -138,7 +138,8 @@ def get_all_businesses():
     country = request.args.get('country')
     page = request.args.get('page')
     per_page = request.args.get('limit')
-    businesses = Business.query
+    businesses = Business.query.order_by(
+        desc(Business.created_at)).order_by(desc(Business.created_at))
 
     # Filter by search query
     if query is not None and query.strip() != '':
