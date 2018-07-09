@@ -73,6 +73,7 @@ class Business(db.Model):
             'user_id': hashid(data.user_id),
             'name': data.name,
             'description': data.description,
+            'category': data.category,
             'country': data.country,
             'city': data.city,
             'reviews_count': Review.query.filter_by(business_id=data.id).count(),
