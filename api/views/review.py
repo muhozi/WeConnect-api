@@ -34,20 +34,21 @@ def add_business_review(business_id):
                 errors=valid)
             response.status_code = 400
             return response
-        Review.save({
+        review = Review.save({
             'user_id': user_id,
             'description': sent_data['review'],
             'business_id': business.id
         })
         response = jsonify({
             'status': 'ok',
-            'message': "Your review has been sent"
+            'message': 'Your review has been sent',
+            'review': review.serialize_one,
         })
         response.status_code = 201
         return response
     response = jsonify({
         'status': 'error',
-        'message': "This business doesn't exist"
+        'message': 'This business doesn\'t exist'
     })
     response.status_code = 400
     return response

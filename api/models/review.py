@@ -31,6 +31,7 @@ class Review(db.Model):
         )
         db.session.add(review)
         db.session.commit()
+        return review
 
     @classmethod
     def serializer(cls, datum):
@@ -45,6 +46,17 @@ class Review(db.Model):
             }
             results.append(obj)
         return results
+
+    @property
+    def serialize_one(self):
+        """ Serialize model object array (Convert into a list) """
+        obj = {
+            'id': hashid(self.id),
+            'user': User.query.get(self.user_id).username.capitalize(),
+            'description': self.description,
+            'created_at': self.created_at,
+        }
+        return obj
 
     @classmethod
     def delete_all(cls, business_id):
