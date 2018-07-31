@@ -61,17 +61,6 @@ class UserTests(MainTests):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'successfully logged', response.data)
 
-    def test_invalid_password(self):
-        """
-            Testing for invalid password
-        """
-        response = self.app.post(self.url_prefix + 'auth/login', data=json.dumps({
-            'email': self.sample_user['email'],
-            'password': 'anyinvalidpassword'
-        }), content_type='application/json')
-        self.assertEqual(response.status_code, 401)
-        self.assertIn(b'Invalid password', response.data)
-
     def test_invalid_credentials(self):
         """
             Testing for invalid credentials

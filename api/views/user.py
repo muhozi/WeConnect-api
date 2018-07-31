@@ -105,12 +105,6 @@ def login():
             response.status_code = 200
             # response.headers['auth_token'] = token
             return response
-        response = jsonify({
-            'status': 'error',
-            'message': "Invalid password"
-        })
-        response.status_code = 401
-        return response
     response = jsonify({
         'status': 'error',
         'message': "Invalid email or password"
