@@ -198,6 +198,60 @@ RESET_LINK_DOCS = {
     }
 }
 
+CONFIRM_EMAIL_DOCS = {
+    "tags": [
+        "User"
+    ],
+    "description": "Confirm email",
+    "parameters": [
+        {
+            "name": "token",
+            "in": "path",
+            "description": "Confirmation token",
+            "schema": {
+                "type": "string",
+            },
+            "required": True,
+        },
+        {
+            "name": "body",
+            "in": "body",
+            "description": "Email",
+            "required": True,
+            "schema": {
+                "id": "confirm_email_schema",
+                "required": [
+                    "email",
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "muhozie@gmail.com"
+                    }
+                }
+            }
+        }
+    ],
+    "responses": {
+        "201": {
+            "description": "Return response status and message",
+            "schema": {
+                "id": "reset_password_response",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Your email was confirmed successfully"
+                    },
+                }
+            }
+        }
+    }
+}
+
 RESET_PASSWORD_DOCS = {
     "tags": [
         "User"

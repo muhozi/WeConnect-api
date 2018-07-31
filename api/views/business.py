@@ -31,7 +31,9 @@ def register_business():
     valid = validate(sent_data, REGISTER_BUSINESS_RULES)
     if valid != True:
         response = jsonify(
-            status='error', message="Please provide required info", errors=valid)
+            status='error',
+            message="Please provide required info",
+            errors=valid)
         response.status_code = 400
         return response
     user_id = token_id(request.headers.get('Authorization'))

@@ -1,9 +1,8 @@
 """
      Initialize the app
 """
-from flask import Flask, jsonify
+from flask import Flask
 from flasgger import Swagger
-from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_mail import Mail
 from config import api_config

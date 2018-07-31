@@ -3,9 +3,9 @@ from api.validations import Validations
 # Registration validations
 REGISTER_RULES = [
     {'username': [('string', True), ('minimum', 4),
-                  ('maximum', 30), ('required', True), ('unique', 'User:username')]},
+                  ('maximum', 30), ('required', True)]},
     {'email': [('minimum', 6), ('maximum', 30),
-               ('required', True), ('email', True), ('unique', 'User:email')]},
+               ('required', True), ('email', True)]},
     {'password': [('minimum', 6), ('maximum', 30), ('required', True)]},
     {'confirm_password': [('minimum', 6), ('maximum', 30),
                           ('required', True), ('same', 'password')]},
@@ -28,6 +28,10 @@ RESET_PWD_RULES = [
     {'password': [('minimum', 6), ('maximum', 30), ('required', True)]},
     {'confirm_password': [('minimum', 6), ('maximum', 30),
                           ('required', True), ('same', 'password')]},
+]
+# Reset password validations
+CONFIRM_EMAIL_RULES = [
+    {'email': [('minimum', 6), ('maximum', 100)]}
 ]
 # Reset password validations
 RESET_LINK_RULES = [

@@ -37,7 +37,7 @@ class UserTests(MainTests):
             'confirm_password': self.sample_user['confirm_password']
         }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
-        self.assertIn(b'email has been taken', response.data)
+        self.assertIn(b'Email has been taken', response.data)
 
     def test_wrong_registration(self):
         """

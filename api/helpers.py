@@ -3,15 +3,15 @@
 """
 import secrets
 from flask_mail import Message
-from api import mail
-from flask import current_app as app
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired, URLSafeSerializer)
 from hashids import Hashids
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
+from flask import current_app as app
+from api import mail
 
 
 def get_token(user_id, expires_in=3600, key=None):
-    """"
+    """
         Generate token helper function
     """
     if key is None:
@@ -39,30 +39,41 @@ def hashid(id_string):
     """
         Generate hashid
     """
-    hashid = Hashids(salt=app.config['SECRET_KEY'], min_length=34)
-    return hashid.encode(id_string)
+    hash_id = Hashids(salt=app.config['SECRET_KEY'], min_length=34)
+    return hash_id.encode(id_string)
 
 
 def get_id(id_string):
     """
         Get id from hashid
     """
-    hashid = Hashids(salt=app.config['SECRET_KEY'], min_length=34)
-    f_id = hashid.decode(id_string)
+    hash_id = Hashids(salt=app.config['SECRET_KEY'], min_length=34)
+    f_id = hash_id.decode(id_string)
     if len(f_id) is not 0:
         return f_id[0]
     return None
 
 
 def generate_reset_token():
+    """ Generate reset password token """
     return secrets.token_urlsafe(84)
 
 
-def send_mail(email, body):
+def get_confirm_email_token(expires_in=3600, key=None):
+    """
+        Generate confirm link token
+    """
+    if key is None:
+        key = app.config['SECRET_KEY']
+    token = Serializer(key, expires_in)
+    return token.dumps({}).decode('ascii')
 
+
+def send_mail(email, body):
+    """ Send resrt password email """
     msg = Message('Reset your account password on WeConnect',
-                  sender=('We Connect','noreply@allconnect.herokuapp.com'),
-                  recipients=[email],
-                  )
+                  sender=('We Connect', 'noreply@allconnect.herokuapp.com'),
+                  recipients=[email]
+                 )
     msg.html = body
     mail.send(msg)

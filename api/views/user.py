@@ -12,14 +12,16 @@ from api.models.password_reset import PasswordReset
 from api.docs.docs import (REGISTER_DOCS,
                            LOGIN_DOCS,
                            LOGOUT_DOCS,
+                           CONFIRM_EMAIL_DOCS,
                            RESET_LINK_DOCS,
                            RESET_PASSWORD_DOCS,
                            CHANGE_PASSWORD_DOCS,
                            GET_BUSINESSES_DOCS)
 from api.inputs.inputs import (
     validate, REGISTER_RULES, LOGIN_RULES, RESET_PWD_RULES,
-    CHANGE_PWD_RULES, RESET_LINK_RULES)
-from api.helpers import get_token, token_id, generate_reset_token, send_mail
+    CHANGE_PWD_RULES, RESET_LINK_RULES, CONFIRM_EMAIL_RULES)
+from api.helpers import (get_token, token_id, generate_reset_token,
+                         get_confirm_email_token, send_mail)
 from api.views import auth
 
 USER = Blueprint('users', __name__)
@@ -33,22 +35,63 @@ def register():
     """
     valid = validate(request.get_json(force=True), REGISTER_RULES)
     sent_data = request.get_json(force=True)
-    if valid != True:
+    if valid is not True:
         response = jsonify(
             status='error', message="Please provide valid details", errors=valid)
         response.status_code = 400
         return response
-    User.save({
-        'username': sent_data['username'],
-        'email': sent_data['email'],
-        'password': generate_password_hash(sent_data['password'])
-    })
-    response = jsonify({
-        'status': 'ok',
-        'message': "You have been successfully registered"
-    })
-    response.status_code = 201
-    return response
+    logged_user = User.get_user(sent_data['email'])
+    if logged_user is None:
+        user = User.query.filter_by(username=sent_data['username']).first()
+        if user is not None:
+            response = jsonify({
+                'status': 'error',
+                'errors': [{
+                    'username': 'Username was taken',
+                }],
+                'message': "Please provide valid details"
+            })
+            response.status_code = 400
+            return response
+        gen_token = get_confirm_email_token()
+        User.save({
+            'username': sent_data['username'],
+            'email': sent_data['email'],
+            'activation_token': gen_token,
+            'password': generate_password_hash(sent_data['password'])
+        })
+        send_mail(sent_data['email'], '<h2>Hello ' + sent_data['username'] +
+                  ', </h2><br>Confirm token is: <b>'+gen_token+'</b>')
+        response = jsonify({
+            'status': 'ok',
+            'message': "You have been successfully registered, Please confirm email address used"
+        })
+        response.status_code = 201
+        return response
+    if logged_user.activation_token is not None:
+        gen_token = get_confirm_email_token()
+        User.update_token(logged_user.id, gen_token)
+        send_mail(logged_user.email, '<h2>Hello ' + logged_user.username +
+                  ', </h2><br>Confirm token is: <b>'+gen_token+'</b>')
+        response = jsonify({
+            'status': 'ok',
+            'message': "You have been successfully registered, Please confirm email address used"
+        })
+        response.status_code = 201
+        return response
+    else:
+        errors = {}
+        if logged_user.username == sent_data['username']:
+            errors['username'] = ['Username has been taken']
+        if logged_user.email == sent_data['email']:
+            errors['email'] = ['Email has been taken']
+        response = jsonify({
+            'status': 'error',
+            'errors': errors,
+            'message': "Please provide valid details"
+        })
+        response.status_code = 400
+        return response
 
 
 @USER.route('auth/logout', methods=['POST'])
@@ -91,11 +134,14 @@ def login():
     if logged_user is not None:
         # Check password
         if check_password_hash(logged_user.password, data['password']):
+            if logged_user.activation_token is not None:
+                response = jsonify({
+                    'status': 'error',
+                    'message': "Please confirm your email address"
+                })
+                response.status_code = 401
+                return response
             token_ = get_token(logged_user.id)
-            token = Token.save({
-                'user_id': logged_user.id,
-                'access_token': token_,
-            })
             response = jsonify({
                 'status': 'ok',
                 'message': 'You have been successfully logged in',
@@ -177,6 +223,45 @@ def reset_password(token):
         'message': "You have successfully reset your password"
     })
     response.status_code = 201
+    return response
+
+
+@USER.route('auth/confirm/<token>', methods=['POST'])
+@swag_from(CONFIRM_EMAIL_DOCS)
+def confirm_email(token):
+    """
+        Confirm email address
+    """
+    sent_data = request.get_json(force=True)
+    valid = validate(sent_data, CONFIRM_EMAIL_RULES)
+    if valid != True:
+        response = jsonify(status='error',
+                           message="Please provide valid details",
+                           errors=valid)
+        response.status_code = 400
+        return response
+    token = User.query.filter_by(activation_token=token, email=sent_data['email']).first()
+    if token is None:
+        response = jsonify({
+            'status': 'error',
+            'message': "Invalid reset token or email"
+        })
+        response.status_code = 400
+        return response
+    user = User.query.filter_by(id=token.id, email=sent_data['email']).first()
+    if user is not None:
+        User.activate(user.id)
+        response = jsonify({
+            'status': 'ok',
+            'message': "Your email was confirmed"
+        })
+        response.status_code = 200
+        return response
+    response = jsonify({
+        'status': 'ok',
+        'message': "Invalid confirm token token or email"
+    })
+    response.status_code = 400
     return response
 
 

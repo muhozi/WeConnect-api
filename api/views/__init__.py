@@ -40,6 +40,14 @@ def auth(arg):
             token = request.headers.get('Authorization')
             token_exist = Token.query.filter_by(access_token=token).first()
             if token_exist is not None and token_id(token):
+                user = User.query.filter_by(id=token_id(token)).first()
+                if user.activation_token is not None:
+                    response = jsonify({
+                        'status': 'error',
+                        'message': "Please confirm your email address"
+                    })
+                    response.status_code = 401
+                    return response
                 return arg(*args, **kwargs)
         response = jsonify({
             'status': 'error',
