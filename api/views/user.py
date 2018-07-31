@@ -149,6 +149,10 @@ def login():
                 response.status_code = 401
                 return response
             token_ = get_token(logged_user.id)
+            Token.save({
+                'user_id': logged_user.id,
+                'access_token': token_,
+            })
             response = jsonify({
                 'status': 'ok',
                 'message': 'You have been successfully logged in',
