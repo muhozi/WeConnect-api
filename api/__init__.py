@@ -4,11 +4,11 @@
 from flask import Flask
 from flasgger import Swagger
 from flask_cors import CORS
-from flask_mail import Mail
+# from flask_mail import Mail
 from config import api_config
 from api.models import db
 # Init Flask mail
-mail = Mail()
+from api.conf import mail
 from api.views.user import USER
 from api.views.business import BUSINESS
 from api.views.review import REVIEW

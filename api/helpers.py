@@ -7,7 +7,7 @@ from hashids import Hashids
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 from flask import current_app as app
-from api import mail
+from api.conf import mail
 
 
 def get_token(user_id, expires_in=3600, key=None):
@@ -74,6 +74,6 @@ def send_mail(email, body):
     msg = Message('Reset your account password on WeConnect',
                   sender=('We Connect', 'noreply@allconnect.herokuapp.com'),
                   recipients=[email]
-                 )
+                  )
     msg.html = body
     mail.send(msg)

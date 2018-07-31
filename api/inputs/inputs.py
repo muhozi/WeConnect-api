@@ -63,7 +63,7 @@ def validate(inputs, all_rules):
                     rule_key, rule[1])
                 if execute is True:
                     pass
-                if execute != True:
+                if execute is not True:
                     if rule_key in error_bag:
                         error_bag[rule_key].append(execute)
                     else:

@@ -27,7 +27,7 @@ class PasswordReset(db.Model):
         db.session.commit()
 
     @classmethod
-    def delete(cls,token_id):
+    def delete(cls, token_id):
         """
             Delete reset token
         """

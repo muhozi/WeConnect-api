@@ -4,7 +4,6 @@ Validations Methods Class
 
 import re
 from api import db
-from api.models.user import User
 
 
 class Validations():
@@ -13,7 +12,8 @@ class Validations():
     def __init__(self, all_inputs):
         """ All inputs dictionary should be available to the class"""
         for key, value in all_inputs.items():
-            if all_inputs[key] is not None and not isinstance(all_inputs[key], int):
+            if (all_inputs[key] is not None and
+                    not isinstance(all_inputs[key], int)):
                 if all_inputs[key].strip() is '':
                     all_inputs[key] = None
         self.all = all_inputs
@@ -30,7 +30,8 @@ class Validations():
         """Check required character size"""
         if key in self.all and self.all[key] is not None:
             if len(self.all[key]) < int(minimum):
-                return key.capitalize() + " should not be less than " + str(minimum) + " characters"
+                return "{} should not be less than {} characters".format(
+                    str(minimum), key.capitalize())
             return True
         return True
 
@@ -38,7 +39,9 @@ class Validations():
         """Check required character size"""
         if key in self.all and self.all[key] is not None:
             if len(self.all[key]) > int(maximum):
-                return key.capitalize() + " should not be greater than " + str(maximum) + " characters"
+                return " should not be greater than {} characters".format(
+                    str(maximum), key.capitalize()
+                )
             return True
         return True
 
@@ -71,7 +74,9 @@ class Validations():
         model = tableRow.split(':')[0]
         row = tableRow.split(':')[1]
         if key in self.all:
-            if ((db.session.query((eval(model)).id).filter(getattr((eval(model)), row) == self.all[key]).scalar()) is not None):
+            if ((db.session.query((eval(model)).id).filter(
+                getattr((eval(model)), row) == self.all[key]
+            ).scalar()) is not None):
                 return row+" has been taken"
             return True
         return True

@@ -27,7 +27,8 @@ class User(db.Model):
         save_user = cls(
             username=user['username'],
             email=user['email'],
-            activation_token=(get_confirm_email_token() if 'confirm_token' not in user else user.get('confirm_token')),
+            activation_token=(get_confirm_email_token(
+            ) if 'confirm_token' not in user else user.get('confirm_token')),
             password=user['password']
         )
         db.session.add(save_user)

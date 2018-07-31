@@ -39,7 +39,7 @@ class Business(db.Model):
 
     @classmethod
     def serializer(cls, datum):
-        """ 
+        """
             Serialize model object array (Convert into a list
         """
         results = []
@@ -52,7 +52,9 @@ class Business(db.Model):
                 'category': data.category,
                 'country': data.country,
                 'city': data.city,
-                'reviews_count': Review.query.filter_by(business_id=data.id).count(),
+                'reviews_count': Review.query.filter_by(
+                    business_id=data.id
+                ).count(),
                 'created_at': data.created_at,
             }
             results.append(obj)
@@ -63,7 +65,9 @@ class Business(db.Model):
         """ Get user businesses """
         found_business_id = get_id(business_id)
         if get_id(business_id) is not None:
-            return cls.query.filter_by(user_id=user_id, id=found_business_id).first()
+            return cls.query.filter_by(
+                user_id=user_id, id=found_business_id
+            ).first()
 
     @classmethod
     def serialize_obj(cls, data):
@@ -76,13 +80,18 @@ class Business(db.Model):
             'category': data.category,
             'country': data.country,
             'city': data.city,
-            'reviews_count': Review.query.filter_by(business_id=data.id).count(),
+            'reviews_count': Review.query.filter_by(
+                business_id=data.id
+            ).count(),
             'created_at': data.created_at,
         }
 
     @classmethod
     def has_two_same_business(cls, user_id, business_name, business_id):
-        """ Check if the user has the two same busines name #nt from the one to update"""
+        """
+            Check if the user has the two same busines name #nt
+            from the one to update
+        """
         if cls.query.filter(cls.user_id == user_id, func.lower(
                 cls.name) == func.lower(business_name),
                 cls.id != get_id(business_id)).first() is not None:

@@ -29,13 +29,15 @@ class BusinessTests(MainTests):
         '''
             Testing business registration
         '''
-        response = self.app.post(self.url_prefix + 'businesses', data=json.dumps({
-            'name': 'Inzora rooftop coffee',
-            'description': 'We have best coffee',
-            'category': 'Coffee-shop',
-            'country': 'Kenya',
-            'city': 'Nairobi'
-        }), headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'businesses',
+            data=json.dumps({
+                'name': 'Inzora rooftop coffee',
+                'description': 'We have best coffee',
+                'category': 'Coffee-shop',
+                'country': 'Kenya',
+                'city': 'Nairobi'
+            }), headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 201)
         self.assertIn(
             b'business has been successfully registered', response.data)
@@ -44,27 +46,30 @@ class BusinessTests(MainTests):
         '''
             Test business registration with the same name under same user
         '''
-        response = self.app.post(self.url_prefix + 'businesses', data=json.dumps({
-            'user_id': self.sample_user['id'],
-            'name': self.rev_business_data['name'],
-            'description': self.rev_business_data['description'],
-            'category': self.rev_business_data['category'],
-            'country': self.rev_business_data['country'],
-            'city': self.rev_business_data['city'],
-        }), headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'businesses', data=json.dumps({
+                'user_id': self.sample_user['id'],
+                'name': self.rev_business_data['name'],
+                'description': self.rev_business_data['description'],
+                'category': self.rev_business_data['category'],
+                'country': self.rev_business_data['country'],
+                'city': self.rev_business_data['city'],
+            }), headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 400)
         self.assertIn(
-            b'You have already a registered business with the same name', response.data)
+            b'You have already registered business with the same name',
+            response.data)
 
     def test_business_with_invalid_data(self):
         '''
             Testing business registration with invalid data
         '''
-        response = self.app.post(self.url_prefix + 'businesses', data=json.dumps({
-            'description': 'We have best coffee for you, ',
-            'country': 'Kenya',
-            'city': 'Nairobi'
-        }), headers={'Authorization': self.test_token}, content_type='application/json')
+        response = self.app.post(self.url_prefix + 'businesses',
+                                 data=json.dumps({
+                                     'description': 'We have best coffee for you, ',
+                                     'country': 'Kenya',
+                                     'city': 'Nairobi'
+                                 }), headers={'Authorization': self.test_token}, content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'Please provide required info', response.data)

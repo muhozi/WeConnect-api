@@ -30,7 +30,8 @@ def add_business_review(business_id):
         valid = validate(sent_data, REVIEW_RULES)
         if valid is not True:
             response = jsonify(
-                status='error', message='Please provide valid details', errors=valid)
+                status='error', message='Please provide valid details',
+                errors=valid)
             response.status_code = 400
             return response
         Review.save({

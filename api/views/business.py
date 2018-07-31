@@ -29,7 +29,7 @@ def register_business():
     """
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, REGISTER_BUSINESS_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(
             status='error',
             message="Please provide required info",
@@ -37,9 +37,15 @@ def register_business():
         response.status_code = 400
         return response
     user_id = token_id(request.headers.get('Authorization'))
-    if Business.query.order_by(desc(Business.created_at)).filter(Business.user_id == user_id, func.lower(Business.name) == func.lower(sent_data['name'])).first() is not None:
+    if Business.query.order_by(
+            desc(Business.created_at)).filter(
+                Business.user_id == user_id, func.lower(
+                    Business.name) == func.lower(sent_data['name'])
+    ).first() is not None:
         response = jsonify(
-            status='error', message="You have already a registered business with the same name")
+            status='error',
+            message=("You have already "
+                     "registered business with the same name"))
         response.status_code = 400
         return response
     data = {
@@ -79,7 +85,8 @@ def delete_business(business_id):
         return response
     response = jsonify(
         status='error',
-        message="This business doesn't exist or you don't have privileges to it")
+        message="""This business doesn't exist or
+          you don't have privileges to it""")
     response.status_code = 400
     return response
 
@@ -96,9 +103,11 @@ def update_business(business_id):
     business = Business.get_by_user(business_id, user_id)
     if business is not None:
         valid = validate(sent_data, REGISTER_BUSINESS_RULES)
-        if valid != True:
+        if valid is not True:
             response = jsonify(
-                status='error', message="Please provide required info", errors=valid)
+                status='error',
+                message="Please provide required info",
+                errors=valid)
             response.status_code = 400
             return response
         data = {
@@ -108,10 +117,13 @@ def update_business(business_id):
             'country': sent_data['country'],
             'city': sent_data['city'],
         }
-        if Business.has_two_same_business(user_id, sent_data['name'], business_id):
+        if Business.has_two_same_business(
+                user_id, sent_data['name'],
+                business_id):
             response = jsonify(
                 status='error',
-                message="You have already registered a business with same name")
+                message=("You have already registered"
+                         " a business with same name"))
             response.status_code = 400
             return response
         Business.update(business_id, data)
@@ -123,7 +135,8 @@ def update_business(business_id):
         return response
     response = jsonify(
         status='error',
-        message="This business doesn't exist or you don't have privileges to it")
+        message=("This business doesn't exist or you"
+                 " don't have privileges to it"))
     response.status_code = 400
     return response
 
@@ -165,7 +178,8 @@ def get_all_businesses():
 
     errors = []  # Errors list
 
-    if per_page is not None and per_page.isdigit() is False and per_page.strip() != '':
+    if (per_page is not None and per_page.isdigit() is False and
+            per_page.strip() != ''):
         errors.append({'limit': 'Invalid limit page limit number'})
 
     if page is not None and page.isdigit() is False and page.strip() != '':
@@ -173,7 +187,9 @@ def get_all_businesses():
 
     if len(errors) is not 0:
         response = jsonify(
-            status='error', message="Please provide valid details", errors=errors)
+            status='error',
+            message="Please provide valid details",
+            errors=errors)
         response.status_code = 400
         return response
 
@@ -187,7 +203,9 @@ def get_all_businesses():
     if len(Business.serializer(businesses.items)) is not 0:
         response = jsonify({
             'status': 'ok',
-            'message': 'There are ' + str(len(businesses.items)) + ' businesses found',
+            'message': 'There are {} businesses found'.format(
+                str(len(businesses.items))
+            ),
             'next_page': businesses.next_num,
             'previous_page': businesses.prev_num,
             'current_page': businesses.page,

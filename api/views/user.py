@@ -37,7 +37,9 @@ def register():
     sent_data = request.get_json(force=True)
     if valid is not True:
         response = jsonify(
-            status='error', message="Please provide valid details", errors=valid)
+            status='error',
+            message="Please provide valid details",
+            errors=valid)
         response.status_code = 400
         return response
     logged_user = User.get_user(sent_data['email'])
@@ -64,7 +66,8 @@ def register():
                   ', </h2><br>Confirm token is: <b>'+gen_token+'</b>')
         response = jsonify({
             'status': 'ok',
-            'message': "You have been successfully registered, Please confirm email address used"
+            'message': """You have been successfully registered,
+                        Please confirm email address"""
         })
         response.status_code = 201
         return response
@@ -75,7 +78,9 @@ def register():
                   ', </h2><br>Confirm token is: <b>'+gen_token+'</b>')
         response = jsonify({
             'status': 'ok',
-            'message': "You have been successfully registered, Please confirm email address used"
+            'message': """
+                        You have been successfully registered,
+                        Please confirm email address used"""
         })
         response.status_code = 201
         return response
@@ -120,9 +125,11 @@ def login():
     """
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, LOGIN_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(
-            status='error', message="Please provide valid details", errors=valid)
+            status='error',
+            message="Please provide valid details",
+            errors=valid)
         response.status_code = 400
         return response
     data = {
@@ -146,7 +153,10 @@ def login():
                 'status': 'ok',
                 'message': 'You have been successfully logged in',
                 'access_token': token_,
-                'user': {'username': logged_user.username, 'email': logged_user.email}
+                'user': {
+                    'username': logged_user.username,
+                    'email': logged_user.email
+                }
             })
             response.status_code = 200
             # response.headers['auth_token'] = token
@@ -168,7 +178,7 @@ def change_password():
     """
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, CHANGE_PWD_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(status='error',
                            message="Please provide valid details",
                            errors=valid)
@@ -201,7 +211,7 @@ def reset_password(token):
     """
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, RESET_PWD_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(status='error',
                            message="Please provide valid details",
                            errors=valid)
@@ -234,13 +244,14 @@ def confirm_email(token):
     """
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, CONFIRM_EMAIL_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(status='error',
                            message="Please provide valid details",
                            errors=valid)
         response.status_code = 400
         return response
-    token = User.query.filter_by(activation_token=token, email=sent_data['email']).first()
+    token = User.query.filter_by(
+        activation_token=token, email=sent_data['email']).first()
     if token is None:
         response = jsonify({
             'status': 'error',
@@ -273,7 +284,7 @@ def reset_link():
     """
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, RESET_LINK_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(status='error',
                            message="Please provide valid details",
                            errors=valid)
@@ -340,7 +351,8 @@ def get_user_businesses():
 
         errors = []  # Errors list
 
-        if per_page is not None and per_page.isdigit() is False and per_page.strip() != '':
+        if (per_page is not None and per_page.isdigit() is False and
+                per_page.strip() != ''):
             errors.append({'limit': 'Invalid limit page limit number'})
 
         if page is not None and page.isdigit() is False and page.strip() != '':
@@ -348,13 +360,15 @@ def get_user_businesses():
 
         if len(errors) is not 0:
             response = jsonify(
-                status='error', message="Please provide valid details", errors=errors)
+                status='error', message="Please provide valid details",
+                errors=errors)
             response.status_code = 400
             return response
 
         page = int(page) if page is not None and page.strip() != '' else 1
         per_page = int(
-            per_page) if per_page is not None and per_page.strip() != '' else 20
+            per_page) if ((per_page is not None)
+                          and (per_page.strip() != '')) else 20
 
         # Overall filter results
         businesses = businesses.paginate(per_page=per_page, page=page)
@@ -362,7 +376,9 @@ def get_user_businesses():
         if len(Business.serializer(businesses.items)) is not 0:
             response = jsonify({
                 'status': 'ok',
-                'message': 'There are ' + str(len(businesses.items)) + ' businesses found',
+                'message': 'There are {} businesses found'.format(
+                    str(len(businesses.items))
+                ),
                 'next_page': businesses.next_num,
                 'previous_page': businesses.prev_num,
                 'current_page': businesses.page,

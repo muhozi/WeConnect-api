@@ -1,5 +1,5 @@
 """
-	Flask configurations and other configurations
+    Flask configurations and other configurations
 """
 import os
 from dotenv import load_dotenv
@@ -48,6 +48,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI') + '_test'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
+
 
 api_config = {
     'development': DevelopmentConfig,

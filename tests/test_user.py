@@ -17,12 +17,13 @@ class UserTests(MainTests):
         '''
             Testing registration
         '''
-        response = self.app.post(self.url_prefix + 'auth/register', data=json.dumps({
-            'username': 'testfdfdkjndf',
-            'email': 'test@tester.cd',
-            'password': '123456',
-            'confirm_password': '123456'
-        }), content_type='application/json')
+        response = self.app.post(self.url_prefix + 'auth/register',
+                                 data=json.dumps({
+                                     'username': 'testfdfdkjndf',
+                                     'email': 'test@tester.cd',
+                                     'password': '123456',
+                                     'confirm_password': '123456'
+                                 }), content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertIn(b'have been successfully registered', response.data)
 
@@ -30,12 +31,15 @@ class UserTests(MainTests):
         '''
             Testing registration with exist email and username
         '''
-        response = self.app.post(self.url_prefix + 'auth/register', data=json.dumps({
-            'username': self.sample_user['username'],
-            'email': self.sample_user['email'],
-            'password': self.sample_user['password'],
-            'confirm_password': self.sample_user['confirm_password']
-        }), content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/register',
+            data=json.dumps({
+                'username': self.sample_user['username'],
+                'email': self.sample_user['email'],
+                'password': self.sample_user['password'],
+                'confirm_password': self.sample_user['confirm_password']
+            }
+            ), content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'Email has been taken', response.data)
 
@@ -43,10 +47,12 @@ class UserTests(MainTests):
         """
             Test registration with incomplete data
         """
-        response = self.app.post(self.url_prefix + 'auth/register', data=json.dumps({
-            'username': 'dummy name',
-            'confirm_password': self.exist_user['confirm_password']
-        }), content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/register',
+            data=json.dumps({
+                'username': 'dummy name',
+                'confirm_password': self.exist_user['confirm_password']
+            }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'Please provide', response.data)
 
@@ -54,10 +60,11 @@ class UserTests(MainTests):
         """
             Testing login
         """
-        response = self.app.post(self.url_prefix + 'auth/login', data=json.dumps({
-            'email': self.sample_user['email'],
-            'password': self.sample_user['password']
-        }), content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/login', data=json.dumps({
+                'email': self.sample_user['email'],
+                'password': self.sample_user['password']
+            }), content_type='application/json')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'successfully logged', response.data)
 
@@ -65,10 +72,12 @@ class UserTests(MainTests):
         """
             Testing for invalid credentials
         """
-        response = self.app.post(self.url_prefix + 'auth/login', data=json.dumps({
-            'email': 'fakeanyemail@gmail.com',
-            'password': 'anyinvalidpassword'
-        }), content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/login',
+            data=json.dumps({
+                'email': 'fakeanyemail@gmail.com',
+                'password': 'anyinvalidpassword'
+            }), content_type='application/json')
         self.assertEqual(response.status_code, 401)
         self.assertIn(b'Invalid email or password', response.data)
 
@@ -76,9 +85,10 @@ class UserTests(MainTests):
         """
             Test registration with incomplete data
         """
-        response = self.app.post(self.url_prefix + 'auth/login', data=json.dumps({
-            'email': 'dummy@dummy.com',
-        }), content_type='application/json')
+        response = self.app.post(self.url_prefix + 'auth/login',
+                                 data=json.dumps({
+                                     'email': 'dummy@dummy.com',
+                                 }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'Please provide', response.data)
 
@@ -86,8 +96,9 @@ class UserTests(MainTests):
         """
             Test Logout
         """
-        response = self.app.post(self.url_prefix + 'auth/logout',
-                                 data={}, headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'auth/logout',
+            data={}, headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'You have successfully logged out', response.data)
 
@@ -139,13 +150,14 @@ class UserTests(MainTests):
             user_id=self.sample_user['id'], reset_token=gen_token)
         db.session.add(token)
         db.session().commit()
-        response = self.app.post(self.url_prefix + 'auth/reset-password/'+gen_token,
-                                 data=json.dumps({
-                                     'email': self.sample_user['email'],
-                                     'password': 'awesome',
-                                     'confirm_password': 'awesome'
-                                 }),
-                                 content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/reset-password/'+gen_token,
+            data=json.dumps({
+                'email': self.sample_user['email'],
+                'password': 'awesome',
+                'confirm_password': 'awesome'
+            }),
+            content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertIn(
             b'You have successfully reset your password', response.data)
@@ -154,13 +166,14 @@ class UserTests(MainTests):
         """
             Testing reset password with a invalid token
         """
-        response = self.app.post(self.url_prefix + 'auth/reset-password/dsaaq342',
-                                 data=json.dumps({
-                                     'email': self.sample_user['email'],
-                                     'password': 'awesome',
-                                     'confirm_password': 'awesome'
-                                 }),
-                                 content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/reset-password/dsaaq342',
+            data=json.dumps({
+                'email': self.sample_user['email'],
+                'password': 'awesome',
+                'confirm_password': 'awesome'
+            }),
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'Invalid reset token', response.data)
@@ -174,12 +187,13 @@ class UserTests(MainTests):
             user_id=self.sample_user['id'], reset_token=gen_token)
         db.session.add(token)
         db.session().commit()
-        response = self.app.post(self.url_prefix + 'auth/reset-password/'+gen_token,
-                                 data=json.dumps({
-                                     'email': self.sample_user['email'],
-                                     'password': 'awesome',
-                                 }),
-                                 content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/reset-password/'+gen_token,
+            data=json.dumps({
+                'email': self.sample_user['email'],
+                'password': 'awesome',
+            }),
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'Please provide valid details', response.data)
@@ -188,13 +202,14 @@ class UserTests(MainTests):
         """
             Testing changing password
         """
-        response = self.app.post(self.url_prefix + 'auth/change-password',
-                                 data=json.dumps({
-                                     'old_password': self.sample_user['password'],
-                                     'new_password': '12345678'
-                                 }),
-                                 content_type='application/json',
-                                 headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'auth/change-password',
+            data=json.dumps({
+                'old_password': self.sample_user['password'],
+                'new_password': '12345678'
+            }),
+            content_type='application/json',
+            headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 201)
         self.assertIn(
             b'You have successfully changed your password', response.data)
@@ -203,12 +218,13 @@ class UserTests(MainTests):
         """
             Testing password change with invalid old password
         """
-        response = self.app.post(self.url_prefix + 'auth/change-password',
-                                 data=json.dumps({
-                                     'old_password': 'sgdffsds', 'new_password': '123456'
-                                 }),
-                                 content_type='application/json',
-                                 headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'auth/change-password',
+            data=json.dumps({
+                'old_password': 'sgdffsds', 'new_password': '123456'
+            }),
+            content_type='application/json',
+            headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'Invalid old password', response.data)
@@ -233,13 +249,14 @@ class UserTests(MainTests):
         """
         # Test invalid token by accessing protected endpoint with invalid
         # authorization token
-        response = self.app.post(self.url_prefix + 'auth/change-password',
-                                 data={
-                                     # Old password
-                                     'old_password': self.sample_user['password'],
-                                     'new_password': '123456'
-                                 },
-                                 headers={'Authorization': 'eyJhbGciOQxYI-vmeqW6'})
+        response = self.app.post(
+            self.url_prefix + 'auth/change-password',
+            data={
+                # Old password
+                'old_password': self.sample_user['password'],
+                'new_password': '123456'
+            },
+            headers={'Authorization': 'eyJhbGciOQxYI-vmeqW6'})
         self.assertEqual(response.status_code, 401)
         self.assertIn(
             b'Unauthorized', response.data)
@@ -249,13 +266,14 @@ class UserTests(MainTests):
             Testing Expired token
         """
         # Test expired token by accessing protected endpoint with expired token
-        response = self.app.post(self.url_prefix + 'auth/change-password',
-                                 data={
-                                     # Old password
-                                     'old_password': self.sample_user['password'],
-                                     'new_password': '123456'
-                                 },
-                                 headers={'Authorization': self.expired_test_token})
+        response = self.app.post(
+            self.url_prefix + 'auth/change-password',
+            data={
+                # Old password
+                'old_password': self.sample_user['password'],
+                'new_password': '123456'
+            },
+            headers={'Authorization': self.expired_test_token})
         self.assertEqual(response.status_code, 401)
         self.assertIn(
             b'Unauthorized', response.data)
@@ -265,8 +283,9 @@ class UserTests(MainTests):
             Testing Bad signature token
         """
         # Access protected endpoint with bad signature token
-        response = self.app.get(self.url_prefix + 'account/businesses',
-                                headers={'Authorization': self.other_signature_token})
+        response = self.app.get(
+            self.url_prefix + 'account/businesses',
+            headers={'Authorization': self.other_signature_token})
         self.assertEqual(response.status_code, 401)
         self.assertIn(
             b'Unauthorize', response.data)
@@ -275,12 +294,14 @@ class UserTests(MainTests):
         '''
             Test validation methods (same,minimum,email,string)
         '''
-        response = self.app.post(self.url_prefix + 'auth/register', data=json.dumps({
-            'username': '@@@',
-            'email': 'sdfsd@dfg',
-            'password': '123',
-            'confirm_password': '123456789'
-        }), content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/register',
+            data=json.dumps({
+                'username': '@@@',
+                'email': 'sdfsd@dfg',
+                'password': '123',
+                'confirm_password': '123456789'
+            }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'Invalid email address', response.data)
         self.assertIn(b'should be string', response.data)
@@ -291,11 +312,13 @@ class UserTests(MainTests):
         '''
             Test validation methods (required,maximum)
         '''
-        response = self.app.post(self.url_prefix + 'auth/register', data=json.dumps({
-            'username': None,
-            'password': 'sgfdcasfgcdfagsdasfdgascgdfcasfd',
-            'confirm_password': 'sgfdcasfgcdfagsdasfdgascgdfcasfd'
-        }), content_type='application/json')
+        response = self.app.post(
+            self.url_prefix + 'auth/register',
+            data=json.dumps({
+                'username': None,
+                'password': 'sgfdcasfgcdfagsdasfdgascgdfcasfd',
+                'confirm_password': 'sgfdcasfgcdfagsdasfdgascgdfcasfd'
+            }), content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'is required', response.data)
         self.assertIn(b'should not be greater', response.data)

@@ -190,7 +190,8 @@ RESET_LINK_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your password has been changed successfully"
+                        "example": ("Your password has been "
+                                    "changed successfully")
                     },
                 }
             }
@@ -308,7 +309,8 @@ RESET_PASSWORD_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your password has been changed successfully"
+                        "example": ("Your password has been "
+                                    "changed successfully")
                     },
                 }
             }
@@ -365,7 +367,8 @@ CHANGE_PASSWORD_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "You have successfully changed your password"
+                        "example": ("You have successfully "
+                                    "changed your password")
                     },
                 }
             }
@@ -438,7 +441,8 @@ REGISTER_BUSINESS_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your business has been successfully registered"
+                        "example": ("Your business has been"
+                                    "successfully registered")
                     },
                 }
             }
@@ -517,7 +521,8 @@ UPDATE_BUSINESS_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your business has been successfully updated"
+                        "example": ("Your business has been "
+                                    "successfully updated")
                     },
                 }
             }
@@ -608,7 +613,8 @@ GET_BUSINESSES_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "You have businesses 1 registered businesses"
+                        "example": ("You have businesses "
+                                    "1 registered businesses")
                     },
                     "businesses": {
                         "type": "array",
@@ -616,11 +622,11 @@ GET_BUSINESSES_DOCS = {
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                    "example": "a69de3743ae249dc3dc2e54c91b3b"
                                 },
                                 "user_id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                    "example": "a69de3743ae24ac89c2e54c9bdsf"
                                 },
                                 "name": {
                                     "type": "string",
@@ -732,7 +738,8 @@ GET_ALL_BUSINESSES_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "You have businesses 1 registered businesses"
+                        "example": ("You have businesses 1 "
+                                    "registered businesses")
                     },
                     "businesses": {
                         "type": "array",
@@ -740,11 +747,11 @@ GET_ALL_BUSINESSES_DOCS = {
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                    "example": "a69de3743aec89dc3dc2e54c91b3b"
                                 },
                                 "user_id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                    "example": "a69de3743ae89dc3dc2e54c9bdsf"
                                 },
                                 "name": {
                                     "type": "string",
@@ -802,7 +809,8 @@ GET_BUSINESS_DOCS = {
     ],
     "responses": {
         "200": {
-            "description": "Return response status and message and business details",
+            "description": ("Return response status "
+                            "and message and business details"),
             "schema": {
                 "id": "get_business_response",
                 "properties": {
@@ -820,11 +828,11 @@ GET_BUSINESS_DOCS = {
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                    "example": "a69de3743aec89dc3dc2e54c91b3b"
                                 },
                                 "user_id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                    "example": "a69de3743aec89dc3dc2e54c9bdsf"
                                 },
                                 "name": {
                                     "type": "string",
@@ -896,7 +904,8 @@ DELETE_BUSINESS_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your business has been successfully deleted"
+                        "example": ("Your business has"
+                                    "been successfully deleted")
                     },
                 }
             }
@@ -941,11 +950,11 @@ BUSINESS_REVIEWS_DOCS = {
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                    "example": "a69de3743ae24ac3dc2e54c91b3b"
                                 },
                                 "user_id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                    "example": "a69de3743ae24acc3dc2e54c9bdsf"
                                 },
                                 "name": {
                                     "type": "string",
@@ -984,7 +993,7 @@ BUSINESS_REVIEWS_DOCS = {
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "c9918c47a9a74a56af54ce44a6d60e2d"
+                                    "example": "c9918c47a9a76af54ce44a6d60e2d"
                                 },
                                 "user": {
                                     "type": "string",
