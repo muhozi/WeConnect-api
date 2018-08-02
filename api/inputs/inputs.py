@@ -2,7 +2,7 @@
 from api.validations import Validations
 # Registration validations
 REGISTER_RULES = [
-    {'username': [('string', True), ('minimum', 4),
+    {'username': [('string', True), ('minimum', 1),
                   ('maximum', 30), ('required', True)]},
     {'email': [('minimum', 6), ('maximum', 30),
                ('required', True), ('email', True)]},
@@ -42,9 +42,9 @@ RESET_LINK_RULES = [
 REGISTER_BUSINESS_RULES = [
     {'name': [('minimum', 2), ('required', True)]},
     {'description': [('minimum', 6), ('required', True)]},
-    {'category': [('minimum', 4), ('required', True)]},
-    {'country': [('minimum', 4), ('required', True)]},
-    {'city': [('minimum', 6), ('required', True)]},
+    {'category': [('minimum', 1), ('required', True)]},
+    {'country': [('minimum', 1), ('required', True)]},
+    {'city': [('minimum', 1), ('required', True)]},
 ]
 REVIEW_RULES = [
     {'review': [('minimum', 4), ('maximum', 250), ('required', True)]},
