@@ -62,13 +62,13 @@ def register():
             'activation_token': gen_token,
             'password': generate_password_hash(sent_data['password'])
         })
-        origin_url = request.headers['Origin'] or ''
+        origin_url = request.headers.get('Origin') or ''
         confirm_link = '{}/auth/confirm-password/{}'.format(
             origin_url, gen_token)
         email = ''.join(
                 ('<h2>Hello {} , </h2><br>To ',
                  'Click <b><a href={}>Here</a></b> to confirm your email'
-                 )).format(user.username,
+                 )).format(sent_data['username'],
                            confirm_link)
         send_mail(sent_data['email'], email)
         response = jsonify({
@@ -81,7 +81,7 @@ def register():
     if logged_user.activation_token is not None:
         gen_token = get_confirm_email_token()
         User.update_token(logged_user.id, gen_token)
-        origin_url = request.headers['Origin'] or ''
+        origin_url = request.headers.get('Origin') or ''
         confirm_link = '{}/auth/confirm-password/{}'.format(
             origin_url, gen_token)
         email = ''.join(
@@ -321,7 +321,7 @@ def reset_link():
     PasswordReset.query.filter_by(user_id=user.id).delete()
     gen_token = generate_reset_token()
     PasswordReset.save(user.id, gen_token)
-    origin_url = request.headers['Origin'] or ''
+    origin_url = request.headers.get('Origin') or ''
     reset_link = '{}/auth/reset-password/{}'.format(origin_url, gen_token)
     email = ''.join(
             ('<h2>Hello {} , </h2><br>To ',
