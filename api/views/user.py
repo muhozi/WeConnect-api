@@ -62,8 +62,15 @@ def register():
             'activation_token': gen_token,
             'password': generate_password_hash(sent_data['password'])
         })
-        send_mail(sent_data['email'], '<h2>Hello ' + sent_data['username'] +
-                  ', </h2><br>Confirm token is: <b>'+gen_token+'</b>')
+        origin_url = request.headers['Origin'] or ''
+        confirm_link = '{}/auth/confirm-password/{}'.format(
+            origin_url, gen_token)
+        email = ''.join(
+                ('<h2>Hello {} , </h2><br>To ',
+                 'Click <b><a href={}>Here</a></b> to confirm your email'
+                 )).format(user.username,
+                           confirm_link)
+        send_mail(sent_data['email'], email)
         response = jsonify({
             'status': 'ok',
             'message': """You have been successfully registered,
@@ -74,8 +81,15 @@ def register():
     if logged_user.activation_token is not None:
         gen_token = get_confirm_email_token()
         User.update_token(logged_user.id, gen_token)
-        send_mail(logged_user.email, '<h2>Hello ' + logged_user.username +
-                  ', </h2><br>Confirm token is: <b>'+gen_token+'</b>')
+        origin_url = request.headers['Origin'] or ''
+        confirm_link = '{}/auth/confirm-password/{}'.format(
+            origin_url, gen_token)
+        email = ''.join(
+                ('<h2>Hello {} , </h2><br>To ',
+                 'Click <b><a href={}>Here</a></b> to confirm your email'
+                 )).format(logged_user.username,
+                           confirm_link)
+        send_mail(sent_data['email'], email)
         response = jsonify({
             'status': 'ok',
             'message': """
@@ -214,6 +228,7 @@ def reset_password(token):
         Reset password reset
     """
     sent_data = request.get_json(force=True)
+    print(sent_data)
     valid = validate(sent_data, RESET_PWD_RULES)
     if valid is not True:
         response = jsonify(status='error',
@@ -230,7 +245,8 @@ def reset_password(token):
         response.status_code = 400
         return response
     user = User.query.filter_by(id=token.user_id).first()
-    User.update_password(user.id, sent_data['password'])
+    User.update_password(
+        user.id, generate_password_hash(sent_data['password']))
     PasswordReset.delete(token.id)
     response = jsonify({
         'status': 'ok',
@@ -305,8 +321,15 @@ def reset_link():
     PasswordReset.query.filter_by(user_id=user.id).delete()
     gen_token = generate_reset_token()
     PasswordReset.save(user.id, gen_token)
-    send_mail(user.email, '<h2>Hello ' + user.username +
-              ', </h2><br>You password reset token is: <b>'+gen_token+'</b>')
+    origin_url = request.headers['Origin'] or ''
+    reset_link = '{}/auth/reset-password/{}'.format(origin_url, gen_token)
+    email = ''.join(
+            ('<h2>Hello {} , </h2><br>To ',
+             'reset your password click <b><a href={}>Here</a></b>'
+             )).format(user.username,
+                       reset_link)
+    send_mail(
+        user.email, email)
     response = jsonify({
         'status': 'ok',
         'message': "Check your email to reset password"

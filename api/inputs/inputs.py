@@ -47,7 +47,7 @@ REGISTER_BUSINESS_RULES = [
     {'city': [('minimum', 6), ('required', True)]},
 ]
 REVIEW_RULES = [
-    {'review': [('minimum', 4), ('required', True)]},
+    {'review': [('minimum', 4), ('maximum', 250), ('required', True)]},
 ]
 
 

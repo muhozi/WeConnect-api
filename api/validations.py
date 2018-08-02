@@ -39,7 +39,7 @@ class Validations():
         """Check required character size"""
         if key in self.all and self.all[key] is not None:
             if len(self.all[key]) > int(maximum):
-                return " should not be greater than {} characters".format(
+                return "{} should not be greater than {} characters".format(
                     str(maximum), key.capitalize()
                 )
             return True
