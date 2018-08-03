@@ -2,7 +2,7 @@
     Business features routes
 """
 from flask import Blueprint, jsonify, request
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, or_
 from flasgger.utils import swag_from
 from api.models.business import Business
 from api.models.review import Review
@@ -147,34 +147,48 @@ def get_all_businesses():
     """
         Get all Businesses
     """
-    query = request.args.get('q')
-    category = request.args.get('category')
-    city = request.args.get('city')
-    country = request.args.get('country')
+    query = request.args.get('name')
+    # category = request.args.get('category')
+    # city = request.args.get('city')
+    # country = request.args.get('country')
+    # searchAll = request.args.get('searchAll')
     page = request.args.get('page')
     per_page = request.args.get('limit')
     businesses = Business.query.order_by(
         desc(Business.created_at)).order_by(desc(Business.created_at))
 
     # Filter by search query
+    # name_q, category_q, country_q, city_q = businesses
+    # if searchAll is None or searchAll != 'true':
+    #     if query is not None and query.strip() != '':
+    #         name_q = func.lower(
+    #             Business.name).like('%' + func.lower(query) + '%')
+
+    #     # Filter by category
+    #     if category is not None and category.strip() != '':
+    #         category_q = func.lower(
+    #             Business.category).like('%' + func.lower(category) + '%')
+
+    #     # Filter by city
+    #     if city is not None and city.strip() != '':
+    #         city_q = func.lower(Business.city).like(
+    #             '%' + func.lower(city) + '%')
+
+    #     # Filter by country
+    #     if country is not None and country.strip() != '':
+    #         country_q = func.lower(Business.country).like(
+    #             '%' + func.lower(query) + '%')
+
+    #     businesses = businesses.filter(
+    #         or_(name_q, category_q, city_q, country_q))
+    # else:
+    # Search by all
     if query is not None and query.strip() != '':
-        businesses = businesses.filter(func.lower(
-            Business.name).like('%' + func.lower(query) + '%'))
-
-    # Filter by category
-    if category is not None and category.strip() != '':
-        businesses = businesses.filter(func.lower(
-            Business.category).like('%' + func.lower(category) + '%'))
-
-    # Filter by city
-    if city is not None and city.strip() != '':
-        businesses = businesses.filter(
-            func.lower(Business.city).like('%' + func.lower(city) + '%'))
-
-    # Filter by country
-    if country is not None and country.strip() != '':
-        businesses = businesses.filter(func.lower(
-            Business.country).like('%' + func.lower(country) + '%'))
+        businesses = businesses.filter(or_(func.lower(
+            Business.name).like('%' + func.lower(query) + '%'), func.lower(
+            Business.city).like('%' + func.lower(query) + '%'), func.lower(
+            Business.category).like('%' + func.lower(query) + '%'), func.lower(
+            Business.country).like('%' + func.lower(query) + '%')))
 
     errors = []  # Errors list
 
