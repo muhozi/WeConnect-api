@@ -164,17 +164,17 @@ def get_all_businesses():
     # Filter by category
     if category is not None and category.strip() != '':
         businesses = businesses.filter(func.lower(
-            Business.category) == func.lower(category))
+            Business.category).like('%' + func.lower(category) + '%'))
 
     # Filter by city
     if city is not None and city.strip() != '':
         businesses = businesses.filter(
-            func.lower(Business.city) == func.lower(city))
+            func.lower(Business.city).like('%' + func.lower(city) + '%'))
 
     # Filter by country
     if country is not None and country.strip() != '':
         businesses = businesses.filter(func.lower(
-            Business.country) == func.lower(country))
+            Business.country).like('%' + func.lower(country) + '%'))
 
     errors = []  # Errors list
 
