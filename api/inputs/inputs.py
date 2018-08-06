@@ -31,7 +31,7 @@ RESET_PWD_RULES = [
 ]
 # Reset password validations
 CONFIRM_EMAIL_RULES = [
-    {'email': [('minimum', 6), ('maximum', 100)]}
+    {'email': [('minimum', 6), ('maximum', 100), ('email', True)]}
 ]
 # Reset password validations
 RESET_LINK_RULES = [

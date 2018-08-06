@@ -33,77 +33,37 @@ def register():
     """
         User Registration
     """
+    errors = {}
     valid = validate(request.get_json(force=True), REGISTER_RULES)
     sent_data = request.get_json(force=True)
     if valid is not True:
-        response = jsonify(
-            status='error',
-            message="Please provide valid details",
-            errors=valid)
-        response.status_code = 400
-        return response
-    logged_user = User.get_user(sent_data['email'])
-    if logged_user is None:
-        user = User.query.filter_by(username=sent_data['username']).first()
-        if user is not None:
-            response = jsonify({
-                'status': 'error',
-                'errors': [{
-                    'username': 'Username was taken',
-                }],
-                'message': "Please provide valid details"
-            })
-            response.status_code = 400
-            return response
-        gen_token = get_confirm_email_token()
-        User.save({
-            'username': sent_data['username'],
-            'email': sent_data['email'],
-            'activation_token': gen_token,
-            'password': generate_password_hash(sent_data['password'])
-        })
-        origin_url = request.headers.get('Origin') or ''
-        confirm_link = '{}/auth/confirm-password/{}'.format(
-            origin_url, gen_token)
-        email = ''.join(
-                ('<h2>Hello {} , </h2><br>To ',
-                 'Click <b><a href={}>Here</a></b> to confirm your email'
-                 )).format(sent_data['username'],
-                           confirm_link)
-        send_mail(sent_data['email'], email)
-        response = jsonify({
-            'status': 'ok',
-            'message': """You have been successfully registered,
-                        Please confirm email address"""
-        })
-        response.status_code = 201
-        return response
-    if logged_user.activation_token is not None:
-        gen_token = get_confirm_email_token()
-        User.update_token(logged_user.id, gen_token)
-        origin_url = request.headers.get('Origin') or ''
-        confirm_link = '{}/auth/confirm-password/{}'.format(
-            origin_url, gen_token)
-        email = ''.join(
-                ('<h2>Hello {} , </h2><br>To ',
-                 'Click <b><a href={}>Here</a></b> to confirm your email'
-                 )).format(logged_user.username,
-                           confirm_link)
-        send_mail(sent_data['email'], email)
-        response = jsonify({
-            'status': 'ok',
-            'message': """
-                        You have been successfully registered,
-                        Please confirm email address used"""
-        })
-        response.status_code = 201
-        return response
-    else:
-        errors = {}
-        if logged_user.username == sent_data['username']:
-            errors['username'] = ['Username has been taken']
-        if logged_user.email == sent_data['email']:
-            errors['email'] = ['Email has been taken']
+        errors = valid
+
+    # Check if if there exists same confirmed email
+    email_check = User.query.filter_by(
+        email=sent_data.get('email')).first()
+    if email_check is not None:
+        if email_check.activation_token is None:
+            errors['email'] = errors.get('email') or []
+            errors['email'].append('Email was taken')
+
+    # Check if if there exists same username
+    username_check = User.query.filter_by(
+        username=sent_data['username']).first()
+    if username_check is not None:
+        if email_check is not None:
+            if (username_check.email is email_check.email) and (
+                email_check.activation_token is not None
+            ):
+                pass
+            else:
+                errors['username'] = errors.get('username') or []
+                errors['username'].append('Username was taken')
+        else:
+            errors['username'] = errors.get('username') or []
+            errors['username'].append('Username was taken')
+
+    if errors:
         response = jsonify({
             'status': 'error',
             'errors': errors,
@@ -111,6 +71,36 @@ def register():
         })
         response.status_code = 400
         return response
+
+    gen_token = get_confirm_email_token()
+    origin_url = request.headers.get('Origin') or ''
+    confirm_link = '{}/auth/confirm-password/{}'.format(
+        origin_url, gen_token)
+    if email_check is not None:
+        User.update_token(email_check.id, gen_token)
+        message = """This account is already registered,
+                    Check your email to confirm"""
+    else:
+        User.save({
+            'username': sent_data['username'],
+            'email': sent_data['email'],
+            'activation_token': gen_token,
+            'password': generate_password_hash(sent_data['password'])
+        })
+        message = """You have been successfully registered,
+                    Please confirm email address"""
+    email = ''.join(
+            ('<h2>Hello {} , </h2><br>To ',
+                'Click <b><a href={}>Here</a></b> to confirm your email'
+             )).format(sent_data['username'],
+                       confirm_link)
+    send_mail(sent_data['email'], email)
+    response = jsonify({
+        'status': 'ok',
+        'message': message
+    })
+    response.status_code = 201
+    return response
 
 
 @USER.route('auth/logout', methods=['POST'])
@@ -275,7 +265,7 @@ def confirm_email(token):
     if token is None:
         response = jsonify({
             'status': 'error',
-            'message': "Invalid reset token or email"
+            'message': "Invalid confirm link token or email"
         })
         response.status_code = 400
         return response
@@ -290,7 +280,7 @@ def confirm_email(token):
         return response
     response = jsonify({
         'status': 'ok',
-        'message': "Invalid confirm token token or email"
+        'message': "Invalid confirm link token or email"
     })
     response.status_code = 400
     return response

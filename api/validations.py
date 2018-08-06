@@ -3,7 +3,6 @@ Validations Methods Class
 """
 
 import re
-from api import db
 
 
 class Validations():
@@ -31,7 +30,7 @@ class Validations():
         if key in self.all and self.all[key] is not None:
             if len(self.all[key]) < int(minimum):
                 return "{} should not be less than {} characters".format(
-                    str(minimum), key.capitalize())
+                    key.capitalize(), str(minimum))
             return True
         return True
 
@@ -40,7 +39,7 @@ class Validations():
         if key in self.all and self.all[key] is not None:
             if len(self.all[key]) > int(maximum):
                 return "{} should not be greater than {} characters".format(
-                    str(maximum), key.capitalize()
+                    key.capitalize(), str(maximum)
                 )
             return True
         return True
@@ -57,7 +56,7 @@ class Validations():
         """Check if given """
         if key in self.all and same in self.all:
             if self.all[same] != self.all[key]:
-                return same + " don't match"
+                return same.capitalize() + " don't match"
             return True
         return True
 
@@ -68,15 +67,3 @@ class Validations():
                 return key.capitalize() + " should not be empty"
             return True
         return key.capitalize() + " is required"
-
-    def unique(self, key, tableRow):
-        """Check if value is unique"""
-        model = tableRow.split(':')[0]
-        row = tableRow.split(':')[1]
-        if key in self.all:
-            if ((db.session.query((eval(model)).id).filter(
-                getattr((eval(model)), row) == self.all[key]
-            ).scalar()) is not None):
-                return row+" has been taken"
-            return True
-        return True

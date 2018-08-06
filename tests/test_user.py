@@ -41,7 +41,8 @@ class UserTests(MainTests):
             }
             ), content_type='application/json')
         self.assertEqual(response.status_code, 400)
-        self.assertIn(b'Email has been taken', response.data)
+        self.assertIn(b'Email was taken', response.data)
+        self.assertIn(b'Username was taken', response.data)
 
     def test_wrong_registration(self):
         """
@@ -68,6 +69,18 @@ class UserTests(MainTests):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'successfully logged', response.data)
 
+    def test_unconfirmed_email_check(self):
+        """
+            Testing unconfirmed email check
+        """
+        response = self.app.post(
+            self.url_prefix + 'auth/login', data=json.dumps({
+                'email': self.unconfirmed_user['email'],
+                'password': self.unconfirmed_user['password']
+            }), content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+        self.assertIn(b'confirm your email address', response.data)
+
     def test_invalid_credentials(self):
         """
             Testing for invalid credentials
@@ -80,6 +93,34 @@ class UserTests(MainTests):
             }), content_type='application/json')
         self.assertEqual(response.status_code, 401)
         self.assertIn(b'Invalid email or password', response.data)
+
+    def test_unconfirmed_email(self):
+        """
+            Testing login with unconfirmed email
+        """
+        response = self.app.post(
+            self.url_prefix + 'auth/login',
+            data=json.dumps({
+                'email': self.unconfirmed_user['email'],
+                'password': self.sample_user['password']
+            }), content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+        self.assertIn(b'Please confirm your email address', response.data)
+
+    def test_reconfirming_email(self):
+        """
+            Testing reconfirming email
+        """
+        response = self.app.post(
+            self.url_prefix + 'auth/register',
+            data=json.dumps({
+                'username': self.unconfirmed_user['username'],
+                'email': self.unconfirmed_user['email'],
+                'password': '123456',
+                'confirm_password': '123456'
+            }), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertIn(b'This account is already registered', response.data)
 
     def test_incomplete_creds(self):
         """
@@ -322,3 +363,43 @@ class UserTests(MainTests):
         self.assertEqual(response.status_code, 400)
         self.assertIn(b'is required', response.data)
         self.assertIn(b'should not be greater', response.data)
+
+    def test_invalid_confirm(self):
+        """
+            Testing reset password email with invalid input
+        """
+        response = self.app.post(self.url_prefix + 'auth/confirm/bfsd',
+                                 data=json.dumps({
+                                     'email': 'fdsfsfds'
+                                 }),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Please provide valid details', response.data)
+
+    def test_invalid_link_token_confirm(self):
+        """
+            Testing reset password email with invalid input
+        """
+        response = self.app.post(self.url_prefix + 'auth/confirm/bfsd',
+                                 data=json.dumps({
+                                     'email': self.unconfirmed_user['email']
+                                 }),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Invalid confirm link token or email', response.data)
+
+    def test_email_confirm(self):
+        """
+            Testing reset password email
+        """
+        response = self.app.post(self.url_prefix + 'auth/confirm/'+(
+            self.unconfirmed_user['activation_token']),
+            data=json.dumps({
+                'email': self.unconfirmed_user['email']
+            }),
+            content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'Your email was confirmed', response.data)
