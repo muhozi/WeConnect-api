@@ -1,6 +1,6 @@
-"""
+'''
         API Documentation
-"""
+'''
 REGISTER_DOCS = {
     "tags": [
         "User"

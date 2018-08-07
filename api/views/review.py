@@ -1,6 +1,6 @@
-"""
+'''
     Reviews features Routes
-"""
+'''
 from flask import Blueprint, jsonify, request
 from flasgger.utils import swag_from
 from sqlalchemy import desc
@@ -20,9 +20,9 @@ REVIEW = Blueprint('reviews', __name__)
 @auth
 @swag_from(ADD_BUSINESS_REVIEW_DOCS)
 def add_business_review(business_id):
-    """
+    '''
         Add Review
-    """
+    '''
     user_id = token_id(request.headers.get('Authorization'))
     business = Business.get(business_id)
     if business is not None:
@@ -57,9 +57,9 @@ def add_business_review(business_id):
 @REVIEW.route('businesses/<business_id>/reviews', methods=['GET'])
 @swag_from(BUSINESS_REVIEWS_DOCS)
 def get_business_reviews(business_id):
-    """
+    '''
         Business reviews
-    """
+    '''
     business = Business.get(business_id)
     if business is not None:
         reviews = Review.query.order_by(desc(Review.created_at)).filter_by(

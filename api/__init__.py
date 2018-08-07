@@ -1,6 +1,6 @@
-"""
+'''
      Initialize the app
-"""
+'''
 from flask import Flask
 from flasgger import Swagger
 from flask_cors import CORS
@@ -51,9 +51,9 @@ TEMPLATE = {
 
 
 def create_app(config_name):
-    """
+    '''
         App init function
-    """
+    '''
     app = Flask(__name__, instance_relative_config=True)
     # Register blueprint
     prefix = '/api/v1/'

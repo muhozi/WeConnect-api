@@ -1,6 +1,6 @@
-"""
+'''
     Our Main api routes
-"""
+'''
 from functools import wraps
 from flask import jsonify, request
 from api.models.user import User
@@ -9,10 +9,10 @@ from api.models.token import Token
 
 
 def auth(arg):
-    """ Auth middleware to check logged in user"""
+    ''' Auth middleware to check logged in user'''
     @wraps(arg)
     def wrap(*args, **kwargs):
-        """ Check if token exists in the request header"""
+        ''' Check if token exists in the request header'''
         if request.headers.get('Authorization'):
             token = request.headers.get('Authorization')
             token_exist = Token.query.filter_by(access_token=token).first()

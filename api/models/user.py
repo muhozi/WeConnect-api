@@ -1,10 +1,10 @@
-""" User Model """
+''' User Model '''
 from api.models import db
 from api.helpers import get_confirm_email_token
 
 
 class User(db.Model):
-    """Users Model"""
+    '''Users Model'''
 
     __tablename__ = "users"
 
@@ -21,9 +21,9 @@ class User(db.Model):
 
     @classmethod
     def save(cls, user):
-        """
+        '''
             Save user
-        """
+        '''
         save_user = cls(
             username=user['username'],
             email=user['email'],
@@ -36,15 +36,15 @@ class User(db.Model):
 
     @classmethod
     def get_user(cls, email):
-        """Check if user exists and return user details"""
+        '''Check if user exists and return user details'''
         user = User.query.filter_by(email=email).first()
         return user
 
     @classmethod
     def update_password(cls, user_id, password):
-        """
+        '''
             Update password
-        """
+        '''
         user = cls.query.get(user_id)
         user.password = password
         db.session.add(user)
@@ -52,7 +52,7 @@ class User(db.Model):
 
     @classmethod
     def update_token(cls, user_id, token):
-        """ Update business"""
+        ''' Update business'''
         user = cls.query.filter_by(id=user_id).first()
         user.activation_token = token
         db.session.add(user)
@@ -60,9 +60,9 @@ class User(db.Model):
 
     @classmethod
     def activate(cls, user_id):
-        """
+        '''
             Update password
-        """
+        '''
         user = cls.query.get(user_id)
         user.activation_token = None
         db.session.add(user)

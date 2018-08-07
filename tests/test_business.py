@@ -1,6 +1,6 @@
-"""
+'''
     Business features tests
-"""
+'''
 from flask import json
 from tests.test_api import MainTests
 from api.models import db
@@ -8,9 +8,9 @@ from api.models.business import Business
 
 
 class BusinessTests(MainTests):
-    """
+    '''
         Business tests class
-    """
+    '''
 
     def test_no_businesses(self):
         '''
@@ -66,10 +66,12 @@ class BusinessTests(MainTests):
         '''
         response = self.app.post(self.url_prefix + 'businesses',
                                  data=json.dumps({
-                                     'description': 'We have best coffee for you, ',
+                                     'description': 'We have best coffee, ',
                                      'country': 'Kenya',
                                      'city': 'Nairobi'
-                                 }), headers={'Authorization': self.test_token}, content_type='application/json')
+                                 }),
+                                 headers={'Authorization': self.test_token},
+                                 content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'Please provide required info', response.data)
@@ -79,8 +81,9 @@ class BusinessTests(MainTests):
             Test removing business
         '''
         self.add_business()
-        response = self.app.delete(self.url_prefix + 'businesses/' + self.business_data['hashid'],
-                                   data={}, headers={'Authorization': self.test_token})
+        response = self.app.delete(
+            self.url_prefix + 'businesses/' + self.business_data['hashid'],
+            data={}, headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 202)
         self.assertIn(
             b'Your business has been successfully deleted', response.data)
@@ -93,9 +96,11 @@ class BusinessTests(MainTests):
         self.business_data['user_id'] = self.sample_user['id']
         # Save business in the storage list for testing
         self.add_business()
-        response = self.app.delete(self.url_prefix + 'businesses/' +
-                                   self.business_data['hashid'],
-                                   data={}, headers={'Authorization': self.orphan_token})
+        response = self.app.delete(
+            self.url_prefix + 'businesses/' +
+            self.business_data['hashid'],
+            data={},
+            headers={'Authorization': self.orphan_token})
         self.assertEqual(response.status_code, 400)
 
     def test_business_update(self):
@@ -112,9 +117,10 @@ class BusinessTests(MainTests):
         }
         # Add user(owner) to the business data dict
         self.add_business()
-        response = self.app.put(self.url_prefix + 'businesses/' + self.business_data['hashid'],
-                                data=json.dumps(new_business_data),
-                                headers={'Authorization': self.test_token})
+        response = self.app.put(
+            self.url_prefix + 'businesses/' + self.business_data['hashid'],
+            data=json.dumps(new_business_data),
+            headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 202)
         self.assertIn(
             b'Your business has been successfully updated', response.data)
@@ -132,12 +138,14 @@ class BusinessTests(MainTests):
             'city': 'Nakuru'
         }
         # Add user(owner) to the business data dict
-        response = self.app.put(self.url_prefix + 'businesses/' + self.business_data['hashid'],
-                                data=json.dumps(new_business_data),
-                                headers={'Authorization': self.orphan_token})
+        response = self.app.put(
+            self.url_prefix + 'businesses/' + self.business_data['hashid'],
+            data=json.dumps(new_business_data),
+            headers={'Authorization': self.orphan_token})
         self.assertEqual(response.status_code, 400)
         self.assertIn(
-            b'This business doesn\'t exist or you don\'t have privileges to it', response.data)
+            b'This business doesn\'t exist or you don\'t have',
+            response.data)
 
     def test_exist_name_business(self):
         '''
@@ -163,13 +171,15 @@ class BusinessTests(MainTests):
         )
         db.session.add(business)
         db.session.commit()
-        response = self.app.put(self.url_prefix + 'businesses/' + self.business_data['hashid'],
-                                data=json.dumps(new_business_data),
-                                headers={'Authorization': self.test_token},
-                                content_type='application/json')
+        response = self.app.put(
+            self.url_prefix + 'businesses/' + self.business_data['hashid'],
+            data=json.dumps(new_business_data),
+            headers={'Authorization': self.test_token},
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(
-            b'You have already registered a business with same name', response.data)
+            b'You have already registered a business with same name',
+            response.data)
 
     def test_invalid_data_business_upd(self):
         '''
@@ -182,10 +192,11 @@ class BusinessTests(MainTests):
             'city': 'Nakuru'
         }
         self.add_business()
-        response = self.app.put(self.url_prefix + 'businesses/' + self.business_data['hashid'],
-                                data=json.dumps(new_business_data),
-                                headers={'Authorization': self.test_token},
-                                content_type='application/json')
+        response = self.app.put(
+            self.url_prefix + 'businesses/' + self.business_data['hashid'],
+            data=json.dumps(new_business_data),
+            headers={'Authorization': self.test_token},
+            content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'Please provide required info', response.data)
@@ -195,7 +206,8 @@ class BusinessTests(MainTests):
             Test retrieving logged in user business without any
         '''
         response = self.app.get(
-            self.url_prefix + 'account/businesses', headers={'Authorization': self.orphan_token})
+            self.url_prefix + 'account/businesses',
+            headers={'Authorization': self.orphan_token})
         self.assertIn(
             b'You don\'t have any registered business', response.data)
 
@@ -208,7 +220,8 @@ class BusinessTests(MainTests):
         self.business_data['user_id'] = self.sample_user['id']
         # Save businesses to test
         response = self.app.get(
-            self.url_prefix + 'account/businesses?q='+self.business_data['name'] +
+            self.url_prefix + 'account/businesses?name=' +
+            self.business_data['name'] +
             '&country='+self.business_data['country'] +
             '&city='+self.business_data['city'] +
             '&category='+self.business_data['category'] +
@@ -225,8 +238,10 @@ class BusinessTests(MainTests):
         self.business_data['user_id'] = self.sample_user['id']
         # Save businesses to test
         response = self.app.get(
-            self.url_prefix + 'account/businesses?q='+self.business_data['name'] +
-            '&country=unknownCountry_g', headers={'Authorization': self.test_token})
+            self.url_prefix + 'account/businesses?name=' +
+            self.business_data['name'] +
+            '&country=unknownCountry_g',
+            headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             b'No business found', response.data)
@@ -255,7 +270,7 @@ class BusinessTests(MainTests):
         self.business_data['user_id'] = self.sample_user['id']
         # Save businesses to test
         response = self.app.get(
-            self.url_prefix + 'businesses?q='+self.business_data['name'] +
+            self.url_prefix + 'businesses?name='+self.business_data['name'] +
             '&country='+self.business_data['country'] +
             '&city='+self.business_data['city'] +
             '&category='+self.business_data['category'] +

@@ -1,4 +1,4 @@
-""" User Model """
+''' User Model '''
 from sqlalchemy import func
 from api.models import db
 from api.models.review import Review
@@ -6,7 +6,7 @@ from api.helpers import hashid, get_id
 
 
 class Business(db.Model):
-    """Business Model"""
+    '''Business Model'''
 
     __tablename__ = "businesses"
 
@@ -23,25 +23,25 @@ class Business(db.Model):
                            server_onupdate=db.func.now(), nullable=False)
 
     def hashid(self):
-        """
+        '''
             Generate hashid
-        """
+        '''
         return hashid(self.id)
 
     @classmethod
     def get(cls, business_id):
-        """
+        '''
             Get business by hashid
-        """
+        '''
         found_id = get_id(business_id)
         if found_id is not None:
             return cls.query.get(found_id)
 
     @classmethod
     def serializer(cls, datum):
-        """
+        '''
             Serialize model object array (Convert into a list
-        """
+        '''
         results = []
         for data in datum:
             obj = {
@@ -62,7 +62,7 @@ class Business(db.Model):
 
     @classmethod
     def get_by_user(cls, business_id, user_id):
-        """ Get user businesses """
+        ''' Get user businesses '''
         found_business_id = get_id(business_id)
         if get_id(business_id) is not None:
             return cls.query.filter_by(
@@ -71,7 +71,7 @@ class Business(db.Model):
 
     @classmethod
     def serialize_obj(cls, data):
-        """ Convert model object to dictionary """
+        ''' Convert model object to dictionary '''
         return {
             'id': hashid(data.id),
             'user_id': hashid(data.user_id),
@@ -88,10 +88,10 @@ class Business(db.Model):
 
     @classmethod
     def has_two_same_business(cls, user_id, business_name, business_id):
-        """
+        '''
             Check if the user has the two same busines name #nt
             from the one to update
-        """
+        '''
         if cls.query.filter(cls.user_id == user_id, func.lower(
                 cls.name) == func.lower(business_name),
                 cls.id != get_id(business_id)).first() is not None:
@@ -100,7 +100,7 @@ class Business(db.Model):
 
     @classmethod
     def update(cls, business_id, data):
-        """ Update business"""
+        ''' Update business'''
         business = cls.query.filter_by(id=get_id(business_id)).first()
         business.name = data['name']
         business.description = data['description']
@@ -112,9 +112,9 @@ class Business(db.Model):
 
     @classmethod
     def save(cls, data):
-        """
+        '''
             Save method
-        """
+        '''
         business = cls(
             user_id=data['user_id'],
             name=data['name'],
@@ -128,9 +128,9 @@ class Business(db.Model):
 
     @classmethod
     def delete(cls, business_id):
-        """
+        '''
             Delete method
-        """
+        '''
         business = cls.query.get(business_id)
         db.session.delete(business)
         db.session.commit()

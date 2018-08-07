@@ -1,4 +1,4 @@
-""" Input Validation Classes """
+''' Input Validation Classes '''
 from api.validations import Validations
 # Registration validations
 REGISTER_RULES = [
@@ -52,7 +52,7 @@ REVIEW_RULES = [
 
 
 def validate(inputs, all_rules):
-    """ Register validation method """
+    ''' Register validation method '''
     error_bag = {}
     valid = Validations(inputs)
     for rules in all_rules:

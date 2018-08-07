@@ -1,6 +1,6 @@
-"""
+'''
     Business features routes
-"""
+'''
 from flask import Blueprint, jsonify, request
 from sqlalchemy import func, desc, or_
 from flasgger.utils import swag_from
@@ -24,9 +24,9 @@ BUSINESS = Blueprint('businesses', __name__)
 @auth
 @swag_from(REGISTER_BUSINESS_DOCS)
 def register_business():
-    """
+    '''
         Register business
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, REGISTER_BUSINESS_RULES)
     if valid is not True:
@@ -69,9 +69,9 @@ def register_business():
 @auth
 @swag_from(DELETE_BUSINESS_DOCS)
 def delete_business(business_id):
-    """
+    '''
         Delete business
-    """
+    '''
     user_id = token_id(request.headers.get('Authorization'))
     business = Business.get_by_user(business_id, user_id)
     if business is not None:
@@ -85,8 +85,8 @@ def delete_business(business_id):
         return response
     response = jsonify(
         status='error',
-        message="""This business doesn't exist or
-          you don't have privileges to it""")
+        message='''This business doesn't exist or
+          you don't have privileges to it''')
     response.status_code = 400
     return response
 
@@ -95,9 +95,9 @@ def delete_business(business_id):
 @auth
 @swag_from(UPDATE_BUSINESS_DOCS)
 def update_business(business_id):
-    """
+    '''
         Update business
-    """
+    '''
     sent_data = request.get_json(force=True)
     user_id = token_id(request.headers.get('Authorization'))
     business = Business.get_by_user(business_id, user_id)
@@ -144,51 +144,59 @@ def update_business(business_id):
 @BUSINESS.route('', methods=['GET'])
 @swag_from(GET_ALL_BUSINESSES_DOCS)
 def get_all_businesses():
-    """
+    '''
         Get all Businesses
-    """
-    query = request.args.get('name')
-    # category = request.args.get('category')
-    # city = request.args.get('city')
-    # country = request.args.get('country')
-    # searchAll = request.args.get('searchAll')
+    '''
+    name = request.args.get('name')
+    category = request.args.get('category')
+    city = request.args.get('city')
+    country = request.args.get('country')
+    searchAll = request.args.get('searchAll')
     page = request.args.get('page')
     per_page = request.args.get('limit')
     businesses = Business.query.order_by(
         desc(Business.created_at)).order_by(desc(Business.created_at))
 
     # Filter by search query
-    # name_q, category_q, country_q, city_q = businesses
-    # if searchAll is None or searchAll != 'true':
-    #     if query is not None and query.strip() != '':
-    #         name_q = func.lower(
-    #             Business.name).like('%' + func.lower(query) + '%')
+    name_q = category_q = country_q = city_q = None
 
-    #     # Filter by category
-    #     if category is not None and category.strip() != '':
-    #         category_q = func.lower(
-    #             Business.category).like('%' + func.lower(category) + '%')
+    if name or category or country or city:
+        # Filter by
+        if name is not None and name.strip() != '':
+            name_q = func.lower(
+                Business.name).like('%' + func.lower(name) + '%')
 
-    #     # Filter by city
-    #     if city is not None and city.strip() != '':
-    #         city_q = func.lower(Business.city).like(
-    #             '%' + func.lower(city) + '%')
+        # Filter by category
+        if category is not None and category.strip() != '':
+            category_q = func.lower(
+                Business.category).like('%' + func.lower(category) + '%')
 
-    #     # Filter by country
-    #     if country is not None and country.strip() != '':
-    #         country_q = func.lower(Business.country).like(
-    #             '%' + func.lower(query) + '%')
+        # Filter by city
+        if city is not None and city.strip() != '':
+            city_q = func.lower(Business.city).like(
+                '%' + func.lower(city) + '%')
 
-    #     businesses = businesses.filter(
-    #         or_(name_q, category_q, city_q, country_q))
-    # else:
-    # Search by all
-    if query is not None and query.strip() != '':
-        businesses = businesses.filter(or_(func.lower(
-            Business.name).like('%' + func.lower(query) + '%'), func.lower(
-            Business.city).like('%' + func.lower(query) + '%'), func.lower(
-            Business.category).like('%' + func.lower(query) + '%'), func.lower(
-            Business.country).like('%' + func.lower(query) + '%')))
+        # Filter by country
+        if country is not None and country.strip() != '':
+            country_q = func.lower(Business.country).like(
+                '%' + func.lower(country) + '%')
+        businesses = businesses.filter(
+            or_(
+                name_q,
+                country_q,
+                city_q,
+                category_q
+            ))
+    if searchAll is not None or searchAll == 'true':
+        print("Magic")
+        # Search by all
+        if name is not None and name.strip() != '':
+            businesses = businesses.filter(or_(func.lower(
+                Business.name).like('%' + func.lower(name) + '%'), func.lower(
+                Business.city).like('%' + func.lower(name) + '%'), func.lower(
+                Business.category).like('%' + func.lower(name) + '%'),
+                func.lower(Business.country).like(
+                    '%' + func.lower(name) + '%')))
 
     errors = []  # Errors list
 
@@ -238,9 +246,9 @@ def get_all_businesses():
 @BUSINESS.route('/<business_id>', methods=['GET'])
 @swag_from(GET_BUSINESS_DOCS)
 def get_business(business_id):
-    """
+    '''
         Get business
-    """
+    '''
     business = Business.get(business_id)
     if business is not None:
         response = jsonify({

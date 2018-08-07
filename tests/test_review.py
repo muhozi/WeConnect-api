@@ -1,6 +1,6 @@
-"""
+'''
     Main test
-"""
+'''
 from flask import json
 from tests.test_api import MainTests
 from api.models.review import Review
@@ -8,19 +8,21 @@ from api.models import db
 
 
 class ReviewTests(MainTests):
-    """
+    '''
         Review tests
-    """
+    '''
+
     def test_add_business_review(self):
         '''
             Test adding business review
         '''
         self.add_business()
-        response = self.app.post(self.url_prefix + 'businesses/' +
-                                 self.business_data['hashid'] + '/reviews',
-                                 data=json.dumps({
-                                     'review': 'We enjoy your coffee',
-                                 }), headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'businesses/' +
+            self.business_data['hashid'] + '/reviews',
+            data=json.dumps({
+                'review': 'We enjoy your coffee',
+            }), headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 201)
         self.assertIn(
             b'Your review has been sent', response.data)
@@ -29,10 +31,11 @@ class ReviewTests(MainTests):
         '''
             Test adding review to business which doesn't exist
         '''
-        response = self.app.post(self.url_prefix + 'businesses/hdfbsjd/reviews',
-                                 data=json.dumps({
-                                     'review': 'We enjoy your coffee',
-                                 }), headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'businesses/hdfbsjd/reviews',
+            data=json.dumps({
+                'review': 'We enjoy your coffee',
+            }), headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'business doesn\'t exist', response.data)
@@ -42,11 +45,12 @@ class ReviewTests(MainTests):
             Test adding empty review
         '''
         self.add_business()
-        response = self.app.post(self.url_prefix + 'businesses/' +
-                                 self.business_data['hashid'] + '/reviews',
-                                 data=json.dumps({
-                                     'review': '',
-                                 }), headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'businesses/' +
+            self.business_data['hashid'] + '/reviews',
+            data=json.dumps({
+                'review': '',
+            }), headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'provide valid details', response.data)
@@ -57,7 +61,9 @@ class ReviewTests(MainTests):
         '''
         self.add_business()
         response = self.app.get(
-            self.url_prefix + 'businesses/' + self.business_data['hashid'] + '/reviews')
+            self.url_prefix + 'businesses/' +
+            self.business_data['hashid'] +
+            '/reviews')
         self.assertIn(
             b'No business review yet', response.data)
 
@@ -91,19 +97,22 @@ class ReviewTests(MainTests):
         db.session.add(review2)
         db.session.commit()
         response = self.app.get(
-            self.url_prefix + 'businesses/' + self.business_data['hashid'] + '/reviews')
+            self.url_prefix + 'businesses/' +
+            self.business_data['hashid'] +
+            '/reviews')
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             b'reviews', response.data)
 
     def test_add_rev_invalid_business(self):
         '''
-            Test adding a review to non-exist business 
+            Test adding a review to non-exist business
         '''
-        response = self.app.post(self.url_prefix + 'businesses/hdfbsjd/reviews',
-                                 data=json.dumps({
-                                     'review': 'We enjoy your coffee',
-                                 }), headers={'Authorization': self.test_token})
+        response = self.app.post(
+            self.url_prefix + 'businesses/hdfbsjd/reviews',
+            data=json.dumps({
+                'review': 'We enjoy your coffee',
+            }), headers={'Authorization': self.test_token})
         self.assertEqual(response.status_code, 400)
         self.assertIn(
             b'business doesn\'t exist', response.data)

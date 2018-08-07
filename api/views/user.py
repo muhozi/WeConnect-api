@@ -1,6 +1,6 @@
-"""
-    User features routes
-"""
+'''
+    User routes
+'''
 from flask import Blueprint, jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from flasgger.utils import swag_from
@@ -30,9 +30,9 @@ USER = Blueprint('users', __name__)
 @USER.route('auth/register', methods=['POST'])
 @swag_from(REGISTER_DOCS)
 def register():
-    """
+    '''
         User Registration
-    """
+    '''
     errors = {}
     valid = validate(request.get_json(force=True), REGISTER_RULES)
     sent_data = request.get_json(force=True)
@@ -49,7 +49,7 @@ def register():
 
     # Check if if there exists same username
     username_check = User.query.filter_by(
-        username=sent_data['username']).first()
+        username=sent_data.get('username')).first()
     if username_check is not None:
         if email_check is not None:
             if (username_check.email is email_check.email) and (
@@ -78,8 +78,8 @@ def register():
         origin_url, gen_token)
     if email_check is not None:
         User.update_token(email_check.id, gen_token)
-        message = """This account is already registered,
-                    Check your email to confirm"""
+        message = '''This account is already registered,
+                    Check your email to confirm'''
     else:
         User.save({
             'username': sent_data['username'],
@@ -87,8 +87,8 @@ def register():
             'activation_token': gen_token,
             'password': generate_password_hash(sent_data['password'])
         })
-        message = """You have been successfully registered,
-                    Please confirm email address"""
+        message = '''You have been successfully registered,
+                    Please confirm email address'''
     email = ''.join(
             ('<h2>Hello {} , </h2><br>To ',
                 'Click <b><a href={}>Here</a></b> to confirm your email'
@@ -107,9 +107,9 @@ def register():
 @auth
 @swag_from(LOGOUT_DOCS)
 def logout():
-    """
+    '''
         User logout
-    """
+    '''
     token = Token.query.filter_by(
         access_token=request.headers.get('Authorization')).first()
     Token.delete(token.id)
@@ -124,9 +124,9 @@ def logout():
 @USER.route('auth/login', methods=['POST'])
 @swag_from(LOGIN_DOCS)
 def login():
-    """
+    '''
         User login
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, LOGIN_RULES)
     if valid is not True:
@@ -181,9 +181,9 @@ def login():
 @auth
 @swag_from(CHANGE_PASSWORD_DOCS)
 def change_password():
-    """
+    '''
         Change password
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, CHANGE_PWD_RULES)
     if valid is not True:
@@ -214,9 +214,9 @@ def change_password():
 @USER.route('auth/reset-password/<token>', methods=['POST'])
 @swag_from(RESET_PASSWORD_DOCS)
 def reset_password(token):
-    """
+    '''
         Reset password reset
-    """
+    '''
     sent_data = request.get_json(force=True)
     print(sent_data)
     valid = validate(sent_data, RESET_PWD_RULES)
@@ -249,9 +249,9 @@ def reset_password(token):
 @USER.route('auth/confirm/<token>', methods=['POST'])
 @swag_from(CONFIRM_EMAIL_DOCS)
 def confirm_email(token):
-    """
+    '''
         Confirm email address
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, CONFIRM_EMAIL_RULES)
     if valid is not True:
@@ -289,9 +289,9 @@ def confirm_email(token):
 @USER.route('auth/reset-password', methods=['POST'])
 @swag_from(RESET_LINK_DOCS)
 def reset_link():
-    """
+    '''
         Reset link
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, RESET_LINK_RULES)
     if valid is not True:
@@ -332,9 +332,9 @@ def reset_link():
 @auth
 @swag_from(GET_BUSINESSES_DOCS)
 def get_user_businesses():
-    """
+    '''
         User's Businesses list
-    """
+    '''
     user_id = token_id(request.headers.get('Authorization'))
     query = request.args.get('q')
     category = request.args.get('category')

@@ -1,6 +1,6 @@
-"""
-    Main tests
-"""
+'''
+    Main test file
+'''
 import unittest
 from werkzeug.security import generate_password_hash
 from api import create_app
@@ -12,15 +12,15 @@ from api.models import db
 
 
 class MainTests(unittest.TestCase):
-    """
+    '''
         Main tests class
-    """
+    '''
     url_prefix = '/api/v1/'
 
     def setUp(self):
-        """
+        '''
             Set up test data
-        """
+        '''
         self.main = create_app('testing')
         self.app = self.main.test_client()
         self.app_context = self.main.app_context()
@@ -88,12 +88,16 @@ class MainTests(unittest.TestCase):
             db.session.commit()
             self.sample_user['id'] = user.id
             self.orphan_id = orphan_user.id
+            self.unconfirmed_user_id = unconfirmed_account.id
             db.session.remove()
             token = Token(user_id=self.sample_user['id'],
                           access_token=get_token(
                 self.sample_user['id']))
             orphan_token = Token(
                 user_id=self.orphan_id, access_token=get_token(self.orphan_id))
+            unconfirmed_user_token = Token(
+                user_id=self.unconfirmed_user_id, access_token=get_token(
+                    self.unconfirmed_user_id))
             expired_token = Token(user_id=self.sample_user['id'],
                                   access_token=get_token(
                 self.sample_user['id'], -3600))
@@ -114,6 +118,7 @@ class MainTests(unittest.TestCase):
             db.session.add(token)
             db.session.add(orphan_token)
             db.session.add(expired_token)
+            db.session.add(unconfirmed_user_token)
             db.session.add(other_signature_token)
             db.session.add(business)
             db.session.commit()
@@ -121,11 +126,12 @@ class MainTests(unittest.TestCase):
             self.expired_test_token = expired_token.access_token
             self.other_signature_token = other_signature_token.access_token
             self.orphan_token = orphan_token.access_token
+            self.unconfirmed_user_token = unconfirmed_user_token.access_token
 
     def add_business(self):
-        """
+        '''
             Add sample business in database
-        """
+        '''
         business = Business(
             user_id=self.sample_user['id'],
             name=self.business_data['name'],

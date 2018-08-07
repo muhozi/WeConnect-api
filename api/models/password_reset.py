@@ -1,9 +1,9 @@
-""" Password reset Model """
+''' Password reset Model '''
 from api.models import db
 
 
 class PasswordReset(db.Model):
-    """assword reset Model class"""
+    '''assword reset Model class'''
 
     __tablename__ = "password_reset_tokens"
 
@@ -19,18 +19,18 @@ class PasswordReset(db.Model):
 
     @classmethod
     def save(cls, user_id, token):
-        """
+        '''
             Save reset token
-        """
+        '''
         reset_token = cls(user_id=user_id, reset_token=token)
         db.session.add(reset_token)
         db.session.commit()
 
     @classmethod
     def delete(cls, token_id):
-        """
+        '''
             Delete reset token
-        """
+        '''
         reset_token = cls.query.get(token_id)
         db.session.delete(reset_token)
         db.session.commit()
