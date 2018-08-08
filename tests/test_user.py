@@ -419,6 +419,20 @@ class UserTests(MainTests):
         self.assertEqual(response.status_code, 200)
         self.assertIn(
             b'Your email was confirmed', response.data)
+    
+    def test_confirming_invalid_email(self):
+        '''
+            Testing email confirmation with invalid email
+        '''
+        response = self.app.post(self.url_prefix + 'auth/confirm/'+(
+            self.unconfirmed_user['activation_token']),
+            data=json.dumps({
+                'email': 'anotheremail@gmail.com'
+            }),
+            content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'Invalid confirm link token or email', response.data)
 
     def test_unconfirmed_email_middleware(self):
         '''
