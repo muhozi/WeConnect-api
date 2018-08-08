@@ -408,7 +408,7 @@ class UserTests(MainTests):
 
     def test_email_confirm(self):
         '''
-            Testing email confirmation
+            Test if email email confirmation token exist
         '''
         response = self.app.post(self.url_prefix + 'auth/confirm/'+(
             self.unconfirmed_user['activation_token']),
@@ -420,14 +420,25 @@ class UserTests(MainTests):
         self.assertIn(
             b'Your email was confirmed', response.data)
 
-    def test_confirm_token(self):
+    def test_confirm_invalid_token(self):
         '''
-            Testing if confirm token exists
+            Test trying to confirm invalid confirm token
         '''
         response = self.app.post(
             self.url_prefix + 'auth/confirm-token',
             data=json.dumps(
                 {'token': 'anyinvalidtoken'}),
+            content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+    
+    def test_confirm_empty_token(self):
+        '''
+            Test trying to confirm invalid empty token
+        '''
+        response = self.app.post(
+            self.url_prefix + 'auth/confirm-token',
+            data=json.dumps(
+                {}),
             content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
