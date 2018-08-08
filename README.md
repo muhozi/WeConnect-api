@@ -71,41 +71,17 @@ Create file name it `.env` and add the following contents:
 
 ```sh
 DEBUG=True
-SECRET_KEY=any_chosen_secret_key
-DATABASE_URI='postgresql://db_user:db_password@127.0.0.1:5432/db_name'
+ENV='development'
+SECRET_KEY='_custom_secret_key'
+DATABASE_URI='postgresql://db_user:db_pass@db_host:db_port/db_name'
+MAIL_SERVER='smtp.mailhost.net'
+MAIL_PORT=25
+MAIL_USERNAME='mail_username'
+MAIL_PASSWORD='mail_password'
+MAIL_DEFAULT_SENDER='default@mailhost.com'
 ```
 
-**OR**
-
-***On windows(cmd)*:**
-
-```sh
-SET SECRET_KEY=any_chosen_secret_key
-```
-
-```sh
-SET DEBUG=True
-```
-
-```sh
-SET DATABASE_URI='postgresql://db_user:db_password@127.0.0.1:5432/db_name'
-```
-
-***On Unix based system*:**
-
-```sh
-export SECRET_KEY=any_chosen_secret_key
-```
-
-```sh
-export DEBUG=True
-```
-
-```sh
-export DATABASE_URI='postgresql://db_user:db_password@127.0.0.1:5432/db_name'
-```
-
-
+To send emails, make sure that you have SMTP server to use. 
 
 ### Run the application
 
@@ -131,31 +107,45 @@ View the API usage (Documentation) in a browser via: http://127.0.0.1:5000/api/v
 
 ### API Endpoints
 
-**`POST /api/v1/auth/register`** *User registration*
+**`POST /auth/register`** *User registration*
 
-**`POST /api/v1/auth/login`** *User login*
+**`POST /auth/login`** *User login*
 
-**`GET /api/v1/businesses/<business-id>/reviews`** *Get all the reviews about a business*
+**`GET /businesses/<business-id>/reviews`** *Get all the reviews about a business*
 
-**`GET /api/v1/businesses/<business-id>`** *Get a business details*
+**`GET /businesses/<business-id>`** *Get a business details*
 
-**`GET /api/v1/businesses`** *Get all registered businesses*
+**`GET /businesses`** *Get all registered businesses*
+
+
 
 <u>**Protected endpoints**</u>: Access token is required (`Authorization` header token)
 
-**`POST /api/v1/auth/logout`** *User logout*
+**`POST /auth/logout`** *User logout*
 
-**`POST /api/v1/auth/reset-password`** *Change password*
+**`POST /auth/reset-password`** *Request password reset*
 
-**`POST /api/v1/businesses`** *Register business*
+**`POST /auth/reset-password/<token>`** *Reset password *
 
-**`PUT /api/v1/businesses/<business-id>`** *Update business details*
+**`POST /businesses`** *Register business*
 
-**`DELETE /api/v1/businesses/<business-id>`** *Delete business*
+**`PUT /businesses/<business-id>`** *Update business details*
 
-**`GET /api/v1/account/businesses`** *Get authenticated user's registered businesses*
+**`DELETE /businesses/<business-id>`** *Delete business*
 
-**`POST /api/v1/businesses/<business-id>/reviews`** *Post a review about business*
+**`GET /account/businesses`** *Get authenticated user's registered businesses*
+
+**`POST /businesses/<business-id>/reviews`** *Post a review about business*
+
+**`POST /auth/change-password`** Change password
+
+**`POST /auth/confirm-token`** Check if confirm email token exists
+
+**`POST /auth/confirm/<token>`** Confirm email
+
+
+
+
 
 
 
@@ -175,15 +165,15 @@ View the API usage (Documentation) in a browser via: http://127.0.0.1:5000/api/v
 
 WeConnect use the following UI technology:
 
-- CSS, HTML, JS
+- ReactJS / Redux
+
+Check the front app [here](https://connectship.herokuapp.com/)
 
 
-- [Bootstrap 4](https://getbootstrap.com/) (HTML, CSS, and JS Framework to develop UI) 
-- Font icons : [Ionicons](http://ionicons.com/)
 
-Have a look at  the UI follow the link for a demo **[Demo](https:///muhozi.github.io/WeConnect/templates)**
+## Thank you!
 
-
+Thank you for checking this out, I would love to hear any feedback from you. Cheers 🎉
 
 ## Author
 
