@@ -1,7 +1,7 @@
 '''
     User routes
 '''
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 from flasgger.utils import swag_from
 from sqlalchemy import func, desc
@@ -91,11 +91,8 @@ def register():
         })
         message = '''You have been successfully registered,
                     Please confirm email address'''
-    email = ''.join(
-            ('<h2>Hello {} , </h2><br>To ',
-                'Click <b><a href={}>Here</a></b> to confirm your email'
-             )).format(sent_data['username'],
-                       confirm_link)
+    email = render_template('emails/reset.html',
+                            name=sent_data['username'], url=confirm_link)
     send_mail(sent_data['email'], email)
     response = jsonify({
         'status': 'ok',
@@ -338,11 +335,8 @@ def reset_link():
     PasswordReset.save(user.id, gen_token)
     origin_url = request.headers.get('Origin') or ''
     reset_link = '{}/auth/reset-password/{}'.format(origin_url, gen_token)
-    email = ''.join(
-            ('<h2>Hello {} , </h2><br>To ',
-             'reset your password click <b><a href={}>Here</a></b>'
-             )).format(user.username,
-                       reset_link)
+    email = render_template('emails/reset.html',
+                            name=user.username, url=reset_link)
     send_mail(
         user.email, email)
     response = jsonify({

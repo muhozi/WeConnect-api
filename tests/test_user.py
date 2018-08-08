@@ -430,7 +430,18 @@ class UserTests(MainTests):
                 {'token': 'anyinvalidtoken'}),
             content_type='application/json')
         self.assertEqual(response.status_code, 400)
-    
+
+    def test_confirm_confirm_token(self):
+        '''
+            Test trying to confirm invalid confirm token
+        '''
+        response = self.app.post(
+            self.url_prefix + 'auth/confirm-token',
+            data=json.dumps(
+                {'token': self.unconfirmed_user['activation_token']}),
+            content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
     def test_confirm_empty_token(self):
         '''
             Test trying to confirm invalid empty token

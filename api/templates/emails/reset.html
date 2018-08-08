@@ -1,0 +1,87 @@
+<html>
+
+<head>
+  <style>
+    .container {
+      width: 100%;
+      float: clear;
+    }
+
+    .a-btn {
+      padding: 12px 35px;
+      border-radius: 8px;
+      outline: 0;
+      background-color: #1f7a8c;
+      border: 1px solid #fff;
+      color: #ffffff !important;
+      cursor: pointer;
+      align-self: center;
+      font-size: 18px;
+      text-decoration: none;
+    }
+
+    .content {
+      padding: 60px 60px;
+      font-size: 20px;
+      font-family: sans-serif;
+      width: 50%;
+      margin: auto;
+      color: #333;
+      font-weight: 100;
+    }
+
+    .info {
+      font-size: 15px;
+      color: #555
+    }
+
+    .line {
+      border-color: #ccc;
+      height: 1px;
+      border: 0;
+      border-top: 1px solid #ccc
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 100
+    }
+
+    .center {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="content">
+      Hi {{name}},
+      <br/>
+      <br/> You've recently asked to reset the password for your We Connect account
+      <br/>
+      <br/>
+      <br/>
+      <div class="center">
+        <a class="a-btn" href={{url}}>
+          Reset my password
+        </a>
+      </div>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <i class="info">If it was not you, Ignore this message, your password will not be changed</i>
+      <br/>
+      <hr class="line" />
+      <footer>
+        <div class="footer">
+          <br/>We Connect ❤️ you
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+
+</html>
