@@ -188,7 +188,6 @@ def get_all_businesses():
                 category_q
             ))
     if searchAll is not None or searchAll == 'true':
-        print("Magic")
         # Search by all
         if name is not None and name.strip() != '':
             businesses = businesses.filter(or_(func.lower(

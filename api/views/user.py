@@ -336,7 +336,7 @@ def get_user_businesses():
         User's Businesses list
     '''
     user_id = token_id(request.headers.get('Authorization'))
-    query = request.args.get('q')
+    query = request.args.get('name')
     category = request.args.get('category')
     city = request.args.get('city')
     country = request.args.get('country')

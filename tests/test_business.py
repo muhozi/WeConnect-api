@@ -281,6 +281,42 @@ class BusinessTests(MainTests):
         self.assertIn(
             b'businesses found', response.data)
 
+    def test_search_all_filters(self):
+        '''
+            Test search all businesses by all keywords
+        '''
+        self.add_business()
+        # Add user(owner) to the business data dict
+        self.business_data['user_id'] = self.sample_user['id']
+        # Save businesses to test
+        response = self.app.get(
+            self.url_prefix + 'businesses?name='+self.business_data['name'] +
+            '&searchAll=true' +
+            '&limit='+'1' +
+            '&page=1'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'businesses found', response.data)
+
+    def test_user_businesses_invalid_limit_number(self):
+        '''
+            Test getting user businesses with invalid page details
+        '''
+        self.add_business()
+        # Add user(owner) to the business data dict
+        self.business_data['user_id'] = self.sample_user['id']
+        # Save businesses to test
+        response = self.app.get(
+            self.url_prefix + 'businesses?name='+self.business_data['name'] +
+            '&searchAll=true' +
+            '&limit='+'fhsjbjh' +  # Invalid page limit number
+            '&page=bhjdbfs'  # Invalid page number
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b'businesses found', response.data)
+
     def test_invalid_page_params(self):
         '''
             Test retrieving business with invalid params
