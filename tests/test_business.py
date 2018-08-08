@@ -227,6 +227,7 @@ class BusinessTests(MainTests):
             '&category='+self.business_data['category'] +
             '&limit=1' +
             '&page=1', headers={'Authorization': self.test_token})
+        print(response)
         self.assertEqual(response.status_code, 200)
 
     def test_user_businesses_search(self):
@@ -308,14 +309,14 @@ class BusinessTests(MainTests):
         self.business_data['user_id'] = self.sample_user['id']
         # Save businesses to test
         response = self.app.get(
-            self.url_prefix + 'businesses?name='+self.business_data['name'] +
-            '&searchAll=true' +
+            self.url_prefix + 'account/businesses?name=' +
+            self.business_data['name'] +
             '&limit='+'fhsjbjh' +  # Invalid page limit number
-            '&page=bhjdbfs'  # Invalid page number
-        )
-        self.assertEqual(response.status_code, 200)
+            '&page=bhjdbfs',  # Invalid page number
+            headers={'Authorization': self.test_token})
+        self.assertEqual(response.status_code, 400)
         self.assertIn(
-            b'businesses found', response.data)
+            b'Please provide valid details', response.data)
 
     def test_invalid_page_params(self):
         '''
