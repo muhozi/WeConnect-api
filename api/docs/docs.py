@@ -234,7 +234,7 @@ CONFIRM_EMAIL_DOCS = {
         }
     ],
     "responses": {
-        "201": {
+        "200": {
             "description": "Return response status and message",
             "schema": {
                 "id": "reset_password_response",
@@ -246,6 +246,51 @@ CONFIRM_EMAIL_DOCS = {
                     "message": {
                         "type": "string",
                         "example": "Your email was confirmed successfully"
+                    },
+                }
+            }
+        }
+    }
+}
+
+CONFIRM_TOKEN_DOCS = {
+    "tags": [
+        "User"
+    ],
+    "description": "Confirm email confirmation token",
+    "parameters": [
+        {
+            "name": "body",
+            "in": "body",
+            "description": "Token",
+            "required": True,
+            "schema": {
+                "id": "confirm_token_schema",
+                "required": [
+                    "token",
+                ],
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "example": "kjsdbfkjsdbfkjsdbfkjsdbfkjsdbkjfbs"
+                    }
+                }
+            }
+        }
+    ],
+    "responses": {
+        "200": {
+            "description": "Return response status and message",
+            "schema": {
+                "id": "confirm_token_response",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Token exists!"
                     },
                 }
             }
@@ -547,9 +592,9 @@ GET_BUSINESSES_DOCS = {
             "required": True,
         },
         {
-            "name": "q",
+            "name": "name",
             "in": "query",
-            "description": "Query string to search business",
+            "description": "Search business by name",
             "schema": {
                 "type": "string",
             },
@@ -558,7 +603,7 @@ GET_BUSINESSES_DOCS = {
         {
             "name": "category",
             "in": "query",
-            "description": "Filter by category",
+            "description": "Search by category",
             "schema": {
                 "type": "string",
             },
@@ -567,7 +612,7 @@ GET_BUSINESSES_DOCS = {
         {
             "name": "country",
             "in": "query",
-            "description": "Filter by country",
+            "description": "Search by country",
             "schema": {
                 "type": "string",
             },
@@ -576,7 +621,7 @@ GET_BUSINESSES_DOCS = {
         {
             "name": "city",
             "in": "query",
-            "description": "Filter by city",
+            "description": "Search by city",
             "schema": {
                 "type": "string",
             },
@@ -605,7 +650,7 @@ GET_BUSINESSES_DOCS = {
         "200": {
             "description": ("Get all authenticated user's businesses list "),
             "schema": {
-                "id": "get_business_response",
+                "id": "get_all_businesses_response",
                 "properties": {
                     "status": {
                         "type": "string",
@@ -619,7 +664,7 @@ GET_BUSINESSES_DOCS = {
                     "businesses": {
                         "type": "array",
                         "items": {
-                            "properties": {
+                            "properties": [{
                                 "id": {
                                     "type": "string",
                                     "example": "a69de3743ae249dc3dc2e54c91b3b"
@@ -656,7 +701,7 @@ GET_BUSINESSES_DOCS = {
                                     "type": "string",
                                     "example": "Thu, 24 May 2018 19:14:36 GMT"
                                 },
-                            }
+                            }]
                         }
                     },
                 }
@@ -669,12 +714,21 @@ GET_ALL_BUSINESSES_DOCS = {
     "tags": [
         "Business"
     ],
-    "description": "Get a list all businesses",
+    "description": "Get a list of all businesses",
     "parameters": [
         {
-            "name": "q",
+            "name": "searchAll",
             "in": "query",
-            "description": "Query string to search business",
+            "description": "Search business by name",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "name",
+            "in": "query",
+            "description": "Search business by name",
             "schema": {
                 "type": "string",
             },
@@ -683,7 +737,7 @@ GET_ALL_BUSINESSES_DOCS = {
         {
             "name": "category",
             "in": "query",
-            "description": "Filter by category",
+            "description": "Search by category",
             "schema": {
                 "type": "string",
             },
@@ -692,7 +746,7 @@ GET_ALL_BUSINESSES_DOCS = {
         {
             "name": "country",
             "in": "query",
-            "description": "Filter by country",
+            "description": "Search by country",
             "schema": {
                 "type": "string",
             },
@@ -701,7 +755,7 @@ GET_ALL_BUSINESSES_DOCS = {
         {
             "name": "city",
             "in": "query",
-            "description": "Filter by city",
+            "description": "Search by city",
             "schema": {
                 "type": "string",
             },
@@ -730,7 +784,7 @@ GET_ALL_BUSINESSES_DOCS = {
         "200": {
             "description": "Return all registered businesses ",
             "schema": {
-                "id": "get_business_response",
+                "id": "get_all_businesses_response",
                 "properties": {
                     "status": {
                         "type": "string",
@@ -743,7 +797,7 @@ GET_ALL_BUSINESSES_DOCS = {
                     },
                     "businesses": {
                         "type": "array",
-                        "items": {
+                        "items": [{
                             "properties": {
                                 "id": {
                                     "type": "string",
@@ -782,7 +836,7 @@ GET_ALL_BUSINESSES_DOCS = {
                                     "example": "Thu, 24 May 2018 19:14:36 GMT"
                                 },
                             }
-                        }
+                        }]
                     },
                 }
             },

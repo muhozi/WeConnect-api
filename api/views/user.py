@@ -16,10 +16,12 @@ from api.docs.docs import (REGISTER_DOCS,
                            RESET_LINK_DOCS,
                            RESET_PASSWORD_DOCS,
                            CHANGE_PASSWORD_DOCS,
-                           GET_BUSINESSES_DOCS)
+                           GET_BUSINESSES_DOCS,
+                           CONFIRM_TOKEN_DOCS)
 from api.inputs.inputs import (
     validate, REGISTER_RULES, LOGIN_RULES, RESET_PWD_RULES,
-    CHANGE_PWD_RULES, RESET_LINK_RULES, CONFIRM_EMAIL_RULES)
+    CHANGE_PWD_RULES, RESET_LINK_RULES, CONFIRM_EMAIL_RULES,
+    CONFIRM_TOKEN_RULES)
 from api.helpers import (get_token, token_id, generate_reset_token,
                          get_confirm_email_token, send_mail)
 from api.views import auth
@@ -218,7 +220,6 @@ def reset_password(token):
         Reset password reset
     '''
     sent_data = request.get_json(force=True)
-    print(sent_data)
     valid = validate(sent_data, RESET_PWD_RULES)
     if valid is not True:
         response = jsonify(status='error',
@@ -270,19 +271,43 @@ def confirm_email(token):
         response.status_code = 400
         return response
     user = User.query.filter_by(id=token.id, email=sent_data['email']).first()
-    if user is not None:
-        User.activate(user.id)
-        response = jsonify({
-            'status': 'ok',
-            'message': "Your email was confirmed"
-        })
-        response.status_code = 200
-        return response
+    User.activate(user.id)
     response = jsonify({
         'status': 'ok',
-        'message': "Invalid confirm link token or email"
+        'message': "Your email was confirmed"
     })
-    response.status_code = 400
+    response.status_code = 200
+    return response
+
+
+@USER.route('auth/confirm-token', methods=['POST'])
+@swag_from(CONFIRM_TOKEN_DOCS)
+def confirm_token_existance():
+    '''
+        Confirm email address
+    '''
+    sent_data = request.get_json(force=True)
+    valid = validate(sent_data, CONFIRM_TOKEN_RULES)
+    if valid is not True:
+        response = jsonify(status='error',
+                           message="Please provide valid details",
+                           errors=valid)
+        response.status_code = 400
+        return response
+    token = User.query.filter_by(
+        activation_token=sent_data['token']).first()
+    if token is None:
+        response = jsonify({
+            'status': 'error',
+            'message': "Invalid confirm link token"
+        })
+        response.status_code = 400
+        return response
+    response = jsonify({
+        'status': 'success',
+        'message': "Token exists!"
+    })
+    response.status_code = 200
     return response
 
 
