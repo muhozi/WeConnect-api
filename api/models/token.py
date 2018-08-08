@@ -1,9 +1,9 @@
-""" Access tokens Model """
+''' Access tokens Model '''
 from api.models import db
 
 
 class Token(db.Model):
-    """Access tokens Model"""
+    '''Access tokens Model'''
 
     __tablename__ = "access_tokens"
 
@@ -19,9 +19,9 @@ class Token(db.Model):
 
     @classmethod
     def save(cls, data):
-        """
+        '''
             Save access token
-        """
+        '''
         token = cls(
             user_id=data['user_id'],
             access_token=data['access_token'],
@@ -31,9 +31,9 @@ class Token(db.Model):
 
     @classmethod
     def delete(cls, token_id):
-        """
+        '''
             Delete token
-        """
+        '''
         token = Token.query.get(token_id)
         db.session.delete(token)
         db.session.commit()

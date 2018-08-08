@@ -1,6 +1,6 @@
-"""
-    Main tests
-"""
+'''
+    Main test file
+'''
 import unittest
 from werkzeug.security import generate_password_hash
 from api import create_app
@@ -12,16 +12,15 @@ from api.models import db
 
 
 class MainTests(unittest.TestCase):
-    """
+    '''
         Main tests class
-    """
+    '''
     url_prefix = '/api/v1/'
 
     def setUp(self):
-        """
+        '''
             Set up test data
-        """
-        # db.init_app(APP)
+        '''
         self.main = create_app('testing')
         self.app = self.main.test_client()
         self.app_context = self.main.app_context()
@@ -41,10 +40,17 @@ class MainTests(unittest.TestCase):
             'password': 'secret',
             'confirm_password': 'secret'
         }
+        self.unconfirmed_user = {
+            'username': 'emery',
+            'email': 'emery@weconnect.com',
+            'password': 'secret',
+            'confirm_password': 'secret',
+            'activation_token': 'AvauDT0T7wo_O6vnb5XJxKzuPteTIpJVv_0HRokS'
+        }
         self.business_data = {
             'name': 'Inzora rooftop coffee',
             'description': 'We have best coffee for you,',
-            'category':'Coffee-shop',
+            'category': 'Coffee-shop',
             'country': 'Kenya',
             'city': 'Nairobi'
         }
@@ -52,7 +58,7 @@ class MainTests(unittest.TestCase):
         self.rev_business_data = {
             'name': 'KFC',
             'description': 'Finger lickin\' good',
-            'category':'Food',
+            'category': 'Food',
             'country': 'Kenya',
             'city': 'Nairobi'
         }
@@ -66,24 +72,40 @@ class MainTests(unittest.TestCase):
             user = User(
                 username=self.sample_user['username'],
                 email=self.sample_user['email'],
-                password=generate_password_hash(self.sample_user['password'])
+                password=generate_password_hash(self.sample_user['password']),
+                activation_token=None
+            )
+            unconfirmed_account = User(
+                username=self.unconfirmed_user['username'],
+                email=self.unconfirmed_user['email'],
+                password=generate_password_hash(
+                    self.unconfirmed_user['password']),
+                activation_token=self.unconfirmed_user['activation_token']
             )
             db.session.add(user)
             db.session.add(orphan_user)
+            db.session.add(unconfirmed_account)
             db.session.commit()
             self.sample_user['id'] = user.id
             self.orphan_id = orphan_user.id
+            self.unconfirmed_user_id = unconfirmed_account.id
             db.session.remove()
-            token = Token(user_id=self.sample_user['id'], access_token=get_token(
+            token = Token(user_id=self.sample_user['id'],
+                          access_token=get_token(
                 self.sample_user['id']))
             orphan_token = Token(
                 user_id=self.orphan_id, access_token=get_token(self.orphan_id))
-            expired_token = Token(user_id=self.sample_user['id'], access_token=get_token(
+            unconfirmed_user_token = Token(
+                user_id=self.unconfirmed_user_id, access_token=get_token(
+                    self.unconfirmed_user_id))
+            expired_token = Token(user_id=self.sample_user['id'],
+                                  access_token=get_token(
                 self.sample_user['id'], -3600))
             # Create bad signature token
             # Bad signature: #nt secret key from the one used in our API used
             # to hash tokens
-            other_signature_token = Token(user_id=self.sample_user['id'], access_token=get_token(
+            other_signature_token = Token(user_id=self.sample_user['id'],
+                                          access_token=get_token(
                 self.sample_user['id'], 3600, 'other_signature'))
             business = Business(
                 user_id=self.sample_user['id'],
@@ -96,6 +118,7 @@ class MainTests(unittest.TestCase):
             db.session.add(token)
             db.session.add(orphan_token)
             db.session.add(expired_token)
+            db.session.add(unconfirmed_user_token)
             db.session.add(other_signature_token)
             db.session.add(business)
             db.session.commit()
@@ -103,11 +126,12 @@ class MainTests(unittest.TestCase):
             self.expired_test_token = expired_token.access_token
             self.other_signature_token = other_signature_token.access_token
             self.orphan_token = orphan_token.access_token
+            self.unconfirmed_user_token = unconfirmed_user_token.access_token
 
     def add_business(self):
-        """
+        '''
             Add sample business in database
-        """
+        '''
         business = Business(
             user_id=self.sample_user['id'],
             name=self.business_data['name'],

@@ -1,6 +1,6 @@
-"""
+'''
         API Documentation
-"""
+'''
 REGISTER_DOCS = {
     "tags": [
         "User"
@@ -190,7 +190,107 @@ RESET_LINK_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your password has been changed successfully"
+                        "example": ("Your password has been "
+                                    "changed successfully")
+                    },
+                }
+            }
+        }
+    }
+}
+
+CONFIRM_EMAIL_DOCS = {
+    "tags": [
+        "User"
+    ],
+    "description": "Confirm email",
+    "parameters": [
+        {
+            "name": "token",
+            "in": "path",
+            "description": "Confirmation token",
+            "schema": {
+                "type": "string",
+            },
+            "required": True,
+        },
+        {
+            "name": "body",
+            "in": "body",
+            "description": "Email",
+            "required": True,
+            "schema": {
+                "id": "confirm_email_schema",
+                "required": [
+                    "email",
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "muhozie@gmail.com"
+                    }
+                }
+            }
+        }
+    ],
+    "responses": {
+        "200": {
+            "description": "Return response status and message",
+            "schema": {
+                "id": "reset_password_response",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Your email was confirmed successfully"
+                    },
+                }
+            }
+        }
+    }
+}
+
+CONFIRM_TOKEN_DOCS = {
+    "tags": [
+        "User"
+    ],
+    "description": "Confirm email confirmation token",
+    "parameters": [
+        {
+            "name": "body",
+            "in": "body",
+            "description": "Token",
+            "required": True,
+            "schema": {
+                "id": "confirm_token_schema",
+                "required": [
+                    "token",
+                ],
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "example": "kjsdbfkjsdbfkjsdbfkjsdbfkjsdbkjfbs"
+                    }
+                }
+            }
+        }
+    ],
+    "responses": {
+        "200": {
+            "description": "Return response status and message",
+            "schema": {
+                "id": "confirm_token_response",
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "example": "ok"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Token exists!"
                     },
                 }
             }
@@ -254,7 +354,8 @@ RESET_PASSWORD_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your password has been changed successfully"
+                        "example": ("Your password has been "
+                                    "changed successfully")
                     },
                 }
             }
@@ -311,7 +412,8 @@ CHANGE_PASSWORD_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "You have successfully changed your password"
+                        "example": ("You have successfully "
+                                    "changed your password")
                     },
                 }
             }
@@ -384,7 +486,8 @@ REGISTER_BUSINESS_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your business has been successfully registered"
+                        "example": ("Your business has been"
+                                    "successfully registered")
                     },
                 }
             }
@@ -463,7 +566,8 @@ UPDATE_BUSINESS_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your business has been successfully updated"
+                        "example": ("Your business has been "
+                                    "successfully updated")
                     },
                 }
             }
@@ -488,9 +592,9 @@ GET_BUSINESSES_DOCS = {
             "required": True,
         },
         {
-            "name": "q",
+            "name": "name",
             "in": "query",
-            "description": "Query string to search business",
+            "description": "Search business by name",
             "schema": {
                 "type": "string",
             },
@@ -499,7 +603,7 @@ GET_BUSINESSES_DOCS = {
         {
             "name": "category",
             "in": "query",
-            "description": "Filter by category",
+            "description": "Search by category",
             "schema": {
                 "type": "string",
             },
@@ -508,7 +612,7 @@ GET_BUSINESSES_DOCS = {
         {
             "name": "country",
             "in": "query",
-            "description": "Filter by country",
+            "description": "Search by country",
             "schema": {
                 "type": "string",
             },
@@ -517,7 +621,7 @@ GET_BUSINESSES_DOCS = {
         {
             "name": "city",
             "in": "query",
-            "description": "Filter by city",
+            "description": "Search by city",
             "schema": {
                 "type": "string",
             },
@@ -546,7 +650,7 @@ GET_BUSINESSES_DOCS = {
         "200": {
             "description": ("Get all authenticated user's businesses list "),
             "schema": {
-                "id": "get_business_response",
+                "id": "get_all_businesses_response",
                 "properties": {
                     "status": {
                         "type": "string",
@@ -554,19 +658,20 @@ GET_BUSINESSES_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "You have businesses 1 registered businesses"
+                        "example": ("You have businesses "
+                                    "1 registered businesses")
                     },
                     "businesses": {
                         "type": "array",
                         "items": {
-                            "properties": {
+                            "properties": [{
                                 "id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                    "example": "a69de3743ae249dc3dc2e54c91b3b"
                                 },
                                 "user_id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                    "example": "a69de3743ae24ac89c2e54c9bdsf"
                                 },
                                 "name": {
                                     "type": "string",
@@ -596,7 +701,7 @@ GET_BUSINESSES_DOCS = {
                                     "type": "string",
                                     "example": "Thu, 24 May 2018 19:14:36 GMT"
                                 },
-                            }
+                            }]
                         }
                     },
                 }
@@ -609,12 +714,21 @@ GET_ALL_BUSINESSES_DOCS = {
     "tags": [
         "Business"
     ],
-    "description": "Get a list all businesses",
+    "description": "Get a list of all businesses",
     "parameters": [
         {
-            "name": "q",
+            "name": "searchAll",
             "in": "query",
-            "description": "Query string to search business",
+            "description": "Search business by name",
+            "schema": {
+                "type": "string",
+            },
+            "required": False,
+        },
+        {
+            "name": "name",
+            "in": "query",
+            "description": "Search business by name",
             "schema": {
                 "type": "string",
             },
@@ -623,7 +737,7 @@ GET_ALL_BUSINESSES_DOCS = {
         {
             "name": "category",
             "in": "query",
-            "description": "Filter by category",
+            "description": "Search by category",
             "schema": {
                 "type": "string",
             },
@@ -632,7 +746,7 @@ GET_ALL_BUSINESSES_DOCS = {
         {
             "name": "country",
             "in": "query",
-            "description": "Filter by country",
+            "description": "Search by country",
             "schema": {
                 "type": "string",
             },
@@ -641,7 +755,7 @@ GET_ALL_BUSINESSES_DOCS = {
         {
             "name": "city",
             "in": "query",
-            "description": "Filter by city",
+            "description": "Search by city",
             "schema": {
                 "type": "string",
             },
@@ -670,7 +784,7 @@ GET_ALL_BUSINESSES_DOCS = {
         "200": {
             "description": "Return all registered businesses ",
             "schema": {
-                "id": "get_business_response",
+                "id": "get_all_businesses_response",
                 "properties": {
                     "status": {
                         "type": "string",
@@ -678,19 +792,20 @@ GET_ALL_BUSINESSES_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "You have businesses 1 registered businesses"
+                        "example": ("You have businesses 1 "
+                                    "registered businesses")
                     },
                     "businesses": {
                         "type": "array",
-                        "items": {
+                        "items": [{
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                    "example": "a69de3743aec89dc3dc2e54c91b3b"
                                 },
                                 "user_id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                    "example": "a69de3743ae89dc3dc2e54c9bdsf"
                                 },
                                 "name": {
                                     "type": "string",
@@ -721,7 +836,7 @@ GET_ALL_BUSINESSES_DOCS = {
                                     "example": "Thu, 24 May 2018 19:14:36 GMT"
                                 },
                             }
-                        }
+                        }]
                     },
                 }
             },
@@ -748,7 +863,8 @@ GET_BUSINESS_DOCS = {
     ],
     "responses": {
         "200": {
-            "description": "Return response status and message and business details",
+            "description": ("Return response status "
+                            "and message and business details"),
             "schema": {
                 "id": "get_business_response",
                 "properties": {
@@ -766,11 +882,11 @@ GET_BUSINESS_DOCS = {
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                    "example": "a69de3743aec89dc3dc2e54c91b3b"
                                 },
                                 "user_id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                    "example": "a69de3743aec89dc3dc2e54c9bdsf"
                                 },
                                 "name": {
                                     "type": "string",
@@ -842,7 +958,8 @@ DELETE_BUSINESS_DOCS = {
                     },
                     "message": {
                         "type": "string",
-                        "example": "Your business has been successfully deleted"
+                        "example": ("Your business has"
+                                    "been successfully deleted")
                     },
                 }
             }
@@ -887,11 +1004,11 @@ BUSINESS_REVIEWS_DOCS = {
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c91b3b"
+                                    "example": "a69de3743ae24ac3dc2e54c91b3b"
                                 },
                                 "user_id": {
                                     "type": "string",
-                                    "example": "a69de3743ae24ac89dc3dc2e54c9bdsf"
+                                    "example": "a69de3743ae24acc3dc2e54c9bdsf"
                                 },
                                 "name": {
                                     "type": "string",
@@ -930,7 +1047,7 @@ BUSINESS_REVIEWS_DOCS = {
                             "properties": {
                                 "id": {
                                     "type": "string",
-                                    "example": "c9918c47a9a74a56af54ce44a6d60e2d"
+                                    "example": "c9918c47a9a76af54ce44a6d60e2d"
                                 },
                                 "user": {
                                     "type": "string",

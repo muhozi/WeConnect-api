@@ -1,7 +1,7 @@
-"""
-    User features routes
-"""
-from flask import Blueprint, jsonify, request
+'''
+    User routes
+'''
+from flask import Blueprint, jsonify, request, render_template
 from werkzeug.security import generate_password_hash, check_password_hash
 from flasgger.utils import swag_from
 from sqlalchemy import func, desc
@@ -12,14 +12,18 @@ from api.models.password_reset import PasswordReset
 from api.docs.docs import (REGISTER_DOCS,
                            LOGIN_DOCS,
                            LOGOUT_DOCS,
+                           CONFIRM_EMAIL_DOCS,
                            RESET_LINK_DOCS,
                            RESET_PASSWORD_DOCS,
                            CHANGE_PASSWORD_DOCS,
-                           GET_BUSINESSES_DOCS)
+                           GET_BUSINESSES_DOCS,
+                           CONFIRM_TOKEN_DOCS)
 from api.inputs.inputs import (
     validate, REGISTER_RULES, LOGIN_RULES, RESET_PWD_RULES,
-    CHANGE_PWD_RULES, RESET_LINK_RULES)
-from api.helpers import get_token, token_id, generate_reset_token, send_mail
+    CHANGE_PWD_RULES, RESET_LINK_RULES, CONFIRM_EMAIL_RULES,
+    CONFIRM_TOKEN_RULES)
+from api.helpers import (get_token, token_id, generate_reset_token,
+                         get_confirm_email_token, send_mail)
 from api.views import auth
 
 USER = Blueprint('users', __name__)
@@ -28,24 +32,71 @@ USER = Blueprint('users', __name__)
 @USER.route('auth/register', methods=['POST'])
 @swag_from(REGISTER_DOCS)
 def register():
-    """
+    '''
         User Registration
-    """
+    '''
+    errors = {}
     valid = validate(request.get_json(force=True), REGISTER_RULES)
     sent_data = request.get_json(force=True)
-    if valid != True:
-        response = jsonify(
-            status='error', message="Please provide valid details", errors=valid)
+    if valid is not True:
+        errors = valid
+
+    # Check if if there exists same confirmed email
+    email_check = User.query.filter_by(
+        email=sent_data.get('email')).first()
+    if email_check is not None:
+        if email_check.activation_token is None:
+            errors['email'] = errors.get('email') or []
+            errors['email'].append('Email was taken')
+
+    # Check if if there exists same username
+    username_check = User.query.filter_by(
+        username=sent_data.get('username')).first()
+    if username_check is not None:
+        if email_check is not None:
+            if (username_check.email is email_check.email) and (
+                email_check.activation_token is not None
+            ):
+                pass
+            else:
+                errors['username'] = errors.get('username') or []
+                errors['username'].append('Username was taken')
+        else:
+            errors['username'] = errors.get('username') or []
+            errors['username'].append('Username was taken')
+
+    if errors:
+        response = jsonify({
+            'status': 'error',
+            'errors': errors,
+            'message': "Please provide valid details"
+        })
         response.status_code = 400
         return response
-    User.save({
-        'username': sent_data['username'],
-        'email': sent_data['email'],
-        'password': generate_password_hash(sent_data['password'])
-    })
+
+    gen_token = get_confirm_email_token()
+    origin_url = request.headers.get('Origin') or ''
+    confirm_link = '{}/auth/confirm-password/{}'.format(
+        origin_url, gen_token)
+    if email_check is not None:
+        User.update_token(email_check.id, gen_token)
+        message = '''This account is already registered,
+                    Check your email to confirm'''
+    else:
+        User.save({
+            'username': sent_data['username'],
+            'email': sent_data['email'],
+            'activation_token': gen_token,
+            'password': generate_password_hash(sent_data['password'])
+        })
+        message = '''You have been successfully registered,
+                    Please confirm email address'''
+    email = render_template('emails/reset.html',
+                            name=sent_data['username'], url=confirm_link)
+    send_mail(sent_data['email'], email)
     response = jsonify({
         'status': 'ok',
-        'message': "You have been successfully registered"
+        'message': message
     })
     response.status_code = 201
     return response
@@ -55,9 +106,9 @@ def register():
 @auth
 @swag_from(LOGOUT_DOCS)
 def logout():
-    """
+    '''
         User logout
-    """
+    '''
     token = Token.query.filter_by(
         access_token=request.headers.get('Authorization')).first()
     Token.delete(token.id)
@@ -72,14 +123,16 @@ def logout():
 @USER.route('auth/login', methods=['POST'])
 @swag_from(LOGIN_DOCS)
 def login():
-    """
+    '''
         User login
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, LOGIN_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(
-            status='error', message="Please provide valid details", errors=valid)
+            status='error',
+            message="Please provide valid details",
+            errors=valid)
         response.status_code = 400
         return response
     data = {
@@ -91,8 +144,15 @@ def login():
     if logged_user is not None:
         # Check password
         if check_password_hash(logged_user.password, data['password']):
+            if logged_user.activation_token is not None:
+                response = jsonify({
+                    'status': 'error',
+                    'message': "Please confirm your email address"
+                })
+                response.status_code = 401
+                return response
             token_ = get_token(logged_user.id)
-            token = Token.save({
+            Token.save({
                 'user_id': logged_user.id,
                 'access_token': token_,
             })
@@ -100,7 +160,10 @@ def login():
                 'status': 'ok',
                 'message': 'You have been successfully logged in',
                 'access_token': token_,
-                'user': {'username': logged_user.username, 'email': logged_user.email}
+                'user': {
+                    'username': logged_user.username,
+                    'email': logged_user.email
+                }
             })
             response.status_code = 200
             # response.headers['auth_token'] = token
@@ -117,12 +180,12 @@ def login():
 @auth
 @swag_from(CHANGE_PASSWORD_DOCS)
 def change_password():
-    """
+    '''
         Change password
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, CHANGE_PWD_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(status='error',
                            message="Please provide valid details",
                            errors=valid)
@@ -150,12 +213,12 @@ def change_password():
 @USER.route('auth/reset-password/<token>', methods=['POST'])
 @swag_from(RESET_PASSWORD_DOCS)
 def reset_password(token):
-    """
+    '''
         Reset password reset
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, RESET_PWD_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(status='error',
                            message="Please provide valid details",
                            errors=valid)
@@ -170,7 +233,8 @@ def reset_password(token):
         response.status_code = 400
         return response
     user = User.query.filter_by(id=token.user_id).first()
-    User.update_password(user.id, sent_data['password'])
+    User.update_password(
+        user.id, generate_password_hash(sent_data['password']))
     PasswordReset.delete(token.id)
     response = jsonify({
         'status': 'ok',
@@ -180,15 +244,79 @@ def reset_password(token):
     return response
 
 
+@USER.route('auth/confirm/<token>', methods=['POST'])
+@swag_from(CONFIRM_EMAIL_DOCS)
+def confirm_email(token):
+    '''
+        Confirm email address
+    '''
+    sent_data = request.get_json(force=True)
+    valid = validate(sent_data, CONFIRM_EMAIL_RULES)
+    if valid is not True:
+        response = jsonify(status='error',
+                           message="Please provide valid details",
+                           errors=valid)
+        response.status_code = 400
+        return response
+    token = User.query.filter_by(
+        activation_token=token, email=sent_data['email']).first()
+    if token is None:
+        response = jsonify({
+            'status': 'error',
+            'message': "Invalid confirm link token or email"
+        })
+        response.status_code = 400
+        return response
+    user = User.query.filter_by(id=token.id, email=sent_data['email']).first()
+    User.activate(user.id)
+    response = jsonify({
+        'status': 'ok',
+        'message': "Your email was confirmed"
+    })
+    response.status_code = 200
+    return response
+
+
+@USER.route('auth/confirm-token', methods=['POST'])
+@swag_from(CONFIRM_TOKEN_DOCS)
+def confirm_token_existance():
+    '''
+        Confirm email address
+    '''
+    sent_data = request.get_json(force=True)
+    valid = validate(sent_data, CONFIRM_TOKEN_RULES)
+    if valid is not True:
+        response = jsonify(status='error',
+                           message="Please provide valid details",
+                           errors=valid)
+        response.status_code = 400
+        return response
+    token = User.query.filter_by(
+        activation_token=sent_data['token']).first()
+    if token is None:
+        response = jsonify({
+            'status': 'error',
+            'message': "Invalid confirm link token"
+        })
+        response.status_code = 400
+        return response
+    response = jsonify({
+        'status': 'success',
+        'message': "Token exists!"
+    })
+    response.status_code = 200
+    return response
+
+
 @USER.route('auth/reset-password', methods=['POST'])
 @swag_from(RESET_LINK_DOCS)
 def reset_link():
-    """
+    '''
         Reset link
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, RESET_LINK_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(status='error',
                            message="Please provide valid details",
                            errors=valid)
@@ -205,8 +333,12 @@ def reset_link():
     PasswordReset.query.filter_by(user_id=user.id).delete()
     gen_token = generate_reset_token()
     PasswordReset.save(user.id, gen_token)
-    send_mail(user.email, '<h2>Hello ' + user.username +
-              ', </h2><br>You password reset token is: <b>'+gen_token+'</b>')
+    origin_url = request.headers.get('Origin') or ''
+    reset_link = '{}/auth/reset-password/{}'.format(origin_url, gen_token)
+    email = render_template('emails/reset.html',
+                            name=user.username, url=reset_link)
+    send_mail(
+        user.email, email)
     response = jsonify({
         'status': 'ok',
         'message': "Check your email to reset password"
@@ -219,11 +351,11 @@ def reset_link():
 @auth
 @swag_from(GET_BUSINESSES_DOCS)
 def get_user_businesses():
-    """
+    '''
         User's Businesses list
-    """
+    '''
     user_id = token_id(request.headers.get('Authorization'))
-    query = request.args.get('q')
+    query = request.args.get('name')
     category = request.args.get('category')
     city = request.args.get('city')
     country = request.args.get('country')
@@ -255,7 +387,8 @@ def get_user_businesses():
 
         errors = []  # Errors list
 
-        if per_page is not None and per_page.isdigit() is False and per_page.strip() != '':
+        if (per_page is not None and per_page.isdigit() is False and
+                per_page.strip() != ''):
             errors.append({'limit': 'Invalid limit page limit number'})
 
         if page is not None and page.isdigit() is False and page.strip() != '':
@@ -263,13 +396,15 @@ def get_user_businesses():
 
         if len(errors) is not 0:
             response = jsonify(
-                status='error', message="Please provide valid details", errors=errors)
+                status='error', message="Please provide valid details",
+                errors=errors)
             response.status_code = 400
             return response
 
         page = int(page) if page is not None and page.strip() != '' else 1
         per_page = int(
-            per_page) if per_page is not None and per_page.strip() != '' else 20
+            per_page) if ((per_page is not None)
+                          and (per_page.strip() != '')) else 20
 
         # Overall filter results
         businesses = businesses.paginate(per_page=per_page, page=page)
@@ -277,7 +412,9 @@ def get_user_businesses():
         if len(Business.serializer(businesses.items)) is not 0:
             response = jsonify({
                 'status': 'ok',
-                'message': 'There are ' + str(len(businesses.items)) + ' businesses found',
+                'message': 'There are {} businesses found'.format(
+                    str(len(businesses.items))
+                ),
                 'next_page': businesses.next_num,
                 'previous_page': businesses.prev_num,
                 'current_page': businesses.page,

@@ -6,6 +6,9 @@ from flask import jsonify, redirect
 from api import create_app
 from api.models import db
 from flask_migrate import Migrate
+from flask_mail import Mail
+# Init Flask mail
+mail = Mail()
 APP = create_app(os.getenv('ENV'))
 migrate = Migrate(APP, db)
 

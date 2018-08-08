@@ -1,19 +1,15 @@
-"""
+'''
      Initialize the app
-"""
-from flask import Flask, jsonify
+'''
+from flask import Flask
 from flasgger import Swagger
-from dotenv import load_dotenv
 from flask_cors import CORS
-from flask_mail import Mail
 from config import api_config
 from api.models import db
-# Init Flask mail
-mail = Mail()
+from api.conf import mail
 from api.views.user import USER
 from api.views.business import BUSINESS
 from api.views.review import REVIEW
-# from api.api import API
 
 # Swagger configurations
 SWAGGER_CONFIG = {
@@ -55,9 +51,9 @@ TEMPLATE = {
 
 
 def create_app(config_name):
-    """
+    '''
         App init function
-    """
+    '''
     app = Flask(__name__, instance_relative_config=True)
     # Register blueprint
     prefix = '/api/v1/'

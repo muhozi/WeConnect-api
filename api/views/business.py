@@ -1,8 +1,8 @@
-"""
+'''
     Business features routes
-"""
+'''
 from flask import Blueprint, jsonify, request
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, or_
 from flasgger.utils import swag_from
 from api.models.business import Business
 from api.models.review import Review
@@ -24,20 +24,28 @@ BUSINESS = Blueprint('businesses', __name__)
 @auth
 @swag_from(REGISTER_BUSINESS_DOCS)
 def register_business():
-    """
+    '''
         Register business
-    """
+    '''
     sent_data = request.get_json(force=True)
     valid = validate(sent_data, REGISTER_BUSINESS_RULES)
-    if valid != True:
+    if valid is not True:
         response = jsonify(
-            status='error', message="Please provide required info", errors=valid)
+            status='error',
+            message="Please provide required info",
+            errors=valid)
         response.status_code = 400
         return response
     user_id = token_id(request.headers.get('Authorization'))
-    if Business.query.order_by(desc(Business.created_at)).filter(Business.user_id == user_id, func.lower(Business.name) == func.lower(sent_data['name'])).first() is not None:
+    if Business.query.order_by(
+            desc(Business.created_at)).filter(
+                Business.user_id == user_id, func.lower(
+                    Business.name) == func.lower(sent_data['name'])
+    ).first() is not None:
         response = jsonify(
-            status='error', message="You have already a registered business with the same name")
+            status='error',
+            message=("You have already "
+                     "registered business with the same name"))
         response.status_code = 400
         return response
     data = {
@@ -61,9 +69,9 @@ def register_business():
 @auth
 @swag_from(DELETE_BUSINESS_DOCS)
 def delete_business(business_id):
-    """
+    '''
         Delete business
-    """
+    '''
     user_id = token_id(request.headers.get('Authorization'))
     business = Business.get_by_user(business_id, user_id)
     if business is not None:
@@ -77,7 +85,8 @@ def delete_business(business_id):
         return response
     response = jsonify(
         status='error',
-        message="This business doesn't exist or you don't have privileges to it")
+        message='''This business doesn't exist or
+          you don't have privileges to it''')
     response.status_code = 400
     return response
 
@@ -86,17 +95,19 @@ def delete_business(business_id):
 @auth
 @swag_from(UPDATE_BUSINESS_DOCS)
 def update_business(business_id):
-    """
+    '''
         Update business
-    """
+    '''
     sent_data = request.get_json(force=True)
     user_id = token_id(request.headers.get('Authorization'))
     business = Business.get_by_user(business_id, user_id)
     if business is not None:
         valid = validate(sent_data, REGISTER_BUSINESS_RULES)
-        if valid != True:
+        if valid is not True:
             response = jsonify(
-                status='error', message="Please provide required info", errors=valid)
+                status='error',
+                message="Please provide required info",
+                errors=valid)
             response.status_code = 400
             return response
         data = {
@@ -106,10 +117,13 @@ def update_business(business_id):
             'country': sent_data['country'],
             'city': sent_data['city'],
         }
-        if Business.has_two_same_business(user_id, sent_data['name'], business_id):
+        if Business.has_two_same_business(
+                user_id, sent_data['name'],
+                business_id):
             response = jsonify(
                 status='error',
-                message="You have already registered a business with same name")
+                message=("You have already registered"
+                         " a business with same name"))
             response.status_code = 400
             return response
         Business.update(business_id, data)
@@ -121,7 +135,8 @@ def update_business(business_id):
         return response
     response = jsonify(
         status='error',
-        message="This business doesn't exist or you don't have privileges to it")
+        message=("This business doesn't exist or you"
+                 " don't have privileges to it"))
     response.status_code = 400
     return response
 
@@ -129,41 +144,63 @@ def update_business(business_id):
 @BUSINESS.route('', methods=['GET'])
 @swag_from(GET_ALL_BUSINESSES_DOCS)
 def get_all_businesses():
-    """
+    '''
         Get all Businesses
-    """
-    query = request.args.get('q')
+    '''
+    name = request.args.get('name')
     category = request.args.get('category')
     city = request.args.get('city')
     country = request.args.get('country')
+    searchAll = request.args.get('searchAll')
     page = request.args.get('page')
     per_page = request.args.get('limit')
     businesses = Business.query.order_by(
         desc(Business.created_at)).order_by(desc(Business.created_at))
 
     # Filter by search query
-    if query is not None and query.strip() != '':
-        businesses = businesses.filter(func.lower(
-            Business.name).like('%' + func.lower(query) + '%'))
+    name_q = category_q = country_q = city_q = None
 
-    # Filter by category
-    if category is not None and category.strip() != '':
-        businesses = businesses.filter(func.lower(
-            Business.category) == func.lower(category))
+    if name or category or country or city:
+        # Filter by
+        if name is not None and name.strip() != '':
+            name_q = func.lower(
+                Business.name).like('%' + func.lower(name) + '%')
 
-    # Filter by city
-    if city is not None and city.strip() != '':
+        # Filter by category
+        if category is not None and category.strip() != '':
+            category_q = func.lower(
+                Business.category).like('%' + func.lower(category) + '%')
+
+        # Filter by city
+        if city is not None and city.strip() != '':
+            city_q = func.lower(Business.city).like(
+                '%' + func.lower(city) + '%')
+
+        # Filter by country
+        if country is not None and country.strip() != '':
+            country_q = func.lower(Business.country).like(
+                '%' + func.lower(country) + '%')
         businesses = businesses.filter(
-            func.lower(Business.city) == func.lower(city))
-
-    # Filter by country
-    if country is not None and country.strip() != '':
-        businesses = businesses.filter(func.lower(
-            Business.country) == func.lower(country))
+            or_(
+                name_q,
+                country_q,
+                city_q,
+                category_q
+            ))
+    if searchAll is not None or searchAll == 'true':
+        # Search by all
+        if name is not None and name.strip() != '':
+            businesses = businesses.filter(or_(func.lower(
+                Business.name).like('%' + func.lower(name) + '%'), func.lower(
+                Business.city).like('%' + func.lower(name) + '%'), func.lower(
+                Business.category).like('%' + func.lower(name) + '%'),
+                func.lower(Business.country).like(
+                    '%' + func.lower(name) + '%')))
 
     errors = []  # Errors list
 
-    if per_page is not None and per_page.isdigit() is False and per_page.strip() != '':
+    if (per_page is not None and per_page.isdigit() is False and
+            per_page.strip() != ''):
         errors.append({'limit': 'Invalid limit page limit number'})
 
     if page is not None and page.isdigit() is False and page.strip() != '':
@@ -171,7 +208,9 @@ def get_all_businesses():
 
     if len(errors) is not 0:
         response = jsonify(
-            status='error', message="Please provide valid details", errors=errors)
+            status='error',
+            message="Please provide valid details",
+            errors=errors)
         response.status_code = 400
         return response
 
@@ -185,7 +224,9 @@ def get_all_businesses():
     if len(Business.serializer(businesses.items)) is not 0:
         response = jsonify({
             'status': 'ok',
-            'message': 'There are ' + str(len(businesses.items)) + ' businesses found',
+            'message': 'There are {} businesses found'.format(
+                str(len(businesses.items))
+            ),
             'next_page': businesses.next_num,
             'previous_page': businesses.prev_num,
             'current_page': businesses.page,
@@ -204,9 +245,9 @@ def get_all_businesses():
 @BUSINESS.route('/<business_id>', methods=['GET'])
 @swag_from(GET_BUSINESS_DOCS)
 def get_business(business_id):
-    """
+    '''
         Get business
-    """
+    '''
     business = Business.get(business_id)
     if business is not None:
         response = jsonify({
