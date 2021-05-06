@@ -16,7 +16,7 @@ Faker==0.8.15
 flake8==3.5.0
 flasgger==0.8.1
 Flask==0.12.2
-Flask-Cors==3.0.4
+Flask-Cors==3.0.9
 Flask-Mail==0.9.1
 Flask-Migrate==2.1.1
 Flask-SQLAlchemy==2.3.2
