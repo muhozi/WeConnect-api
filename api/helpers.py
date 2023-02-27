@@ -12,7 +12,7 @@ from flask import current_app as app
 from api.conf import mail
 
 
-def get_token(user_id, expires_in=3600, key=None):
+def get_token(user_id, expires_in=3600):
     '''
         Generate token helper function
     '''
@@ -21,8 +21,6 @@ def get_token(user_id, expires_in=3600, key=None):
         'id': user_id,
         'exp': int(time.time() + expires_in)
     }
-    if key is None:
-        key = app.config['SECRET_KEY']
     token = jwt.encode(header, payload, app.config['PRIVATE_KEY'])
     token = token.decode()
     return token

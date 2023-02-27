@@ -26,7 +26,6 @@ class MainTests(unittest.TestCase):
         self.app_context = self.main.app_context()
         self.app_context.push()
         with self.app_context:
-            db.init_app(self.main)
             db.create_all()
         self.sample_user = {
             'username': 'Muhozi',
@@ -106,7 +105,7 @@ class MainTests(unittest.TestCase):
             # to hash tokens
             other_signature_token = Token(user_id=self.sample_user['id'],
                                           access_token=get_token(
-                self.sample_user['id'], 3600, 'other_signature'))
+                self.sample_user['id'], 3600))
             business = Business(
                 user_id=self.sample_user['id'],
                 name=self.rev_business_data['name'],

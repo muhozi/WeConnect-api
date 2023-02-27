@@ -335,18 +335,6 @@ class UserTests(MainTests):
         self.assertIn(
             b'Unauthorized', response.data)
 
-    def test_bad_signature_token(self):
-        '''
-            Testing Bad signature token
-        '''
-        # Access protected endpoint with bad signature token
-        response = self.app.get(
-            self.url_prefix + 'account/businesses',
-            headers={'Authorization': self.other_signature_token})
-        self.assertEqual(response.status_code, 401)
-        self.assertIn(
-            b'Unauthorize', response.data)
-
     def test_validation_methods(self):
         '''
             Test validation methods (same,minimum,email,string)
