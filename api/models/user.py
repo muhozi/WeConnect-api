@@ -28,7 +28,7 @@ class User(db.Model):
             username=user['username'],
             email=user['email'],
             activation_token=(get_confirm_email_token(
-            ) if 'confirm_token' not in user else user.get('confirm_token')),
+                user['email']) if 'confirm_token' not in user else user.get('confirm_token')),
             password=user['password']
         )
         db.session.add(save_user)

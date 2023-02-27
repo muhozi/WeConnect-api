@@ -13,6 +13,8 @@ class Config():
     JSON_SORT_KEYS = False
     # Configs loaded from env
     SECRET_KEY = os.getenv('SECRET_KEY')
+    PRIVATE_KEY = os.getenv('PRIVATE_KEY')
+    PUBLIC_KEY = os.getenv('PUBLIC_KEY')
     MAIL_SERVER = os.getenv('MAIL_SERVER')
     MAIL_PORT = os.getenv('MAIL_PORT')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')

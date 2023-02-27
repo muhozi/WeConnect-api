@@ -2,10 +2,12 @@
     Helper Methods
 '''
 import secrets
+import time
 from flask_mail import Message
 from hashids import Hashids
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
+from authlib.jose import jwt
+from authlib.jose.errors import ExpiredTokenError
+from itsdangerous import (URLSafeTimedSerializer as Serializer)
 from flask import current_app as app
 from api.conf import mail
 
@@ -14,25 +16,30 @@ def get_token(user_id, expires_in=3600, key=None):
     '''
         Generate token helper function
     '''
+    header = {'alg': 'RS256'}
+    payload = {
+        'id': user_id,
+        'exp': int(time.time() + expires_in)
+    }
     if key is None:
         key = app.config['SECRET_KEY']
-    token = Serializer(key, expires_in)
-    token_with_id = token.dumps({'id': user_id})
-    return token_with_id.decode('ascii')
+    token = jwt.encode(header, payload, app.config['PRIVATE_KEY'])
+    token = token.decode()
+    return token
 
 
 def token_id(token):
     '''
         Check token if token is valid this returns ID aapended to it
     '''
-    deserialize_token = Serializer(app.config['SECRET_KEY'])
     try:
-        data = deserialize_token.loads(token)
-    except SignatureExpired:
-        return False  # valid token, but expired
-    except BadSignature:
-        return False  # invalid token
-    return data['id']
+        claims = jwt.decode(token, app.config['PUBLIC_KEY'])
+        claims.validate()
+    except ExpiredTokenError:
+        return False
+    except:
+        return False
+    return claims['id']
 
 
 def hashid(id_string):
@@ -59,21 +66,19 @@ def generate_reset_token():
     return secrets.token_urlsafe(84)
 
 
-def get_confirm_email_token(expires_in=3600, key=None):
+def get_confirm_email_token(email, key=None):
     '''
         Generate confirm link token
     '''
     if key is None:
         key = app.config['SECRET_KEY']
-    token = Serializer(key, expires_in)
-    return token.dumps({}).decode('ascii')
+    token = Serializer(key)
+    return token.dumps(email)
 
 
-def send_mail(email, body):
-    ''' Send resrt password email '''
-    msg = Message('Reset your account password on WeConnect',
-                  sender=('We Connect', 'noreply@allconnect.herokuapp.com'),
-                  recipients=[email]
-                  )
+def send_mail(subject, email, body):
+    ''' Send reset password email '''
+    msg = Message(subject, sender=(
+        'We Connect', 'noreply@weconnect.com'), recipients=[email])
     msg.html = body
     mail.send(msg)

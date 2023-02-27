@@ -74,7 +74,7 @@ def register():
         response.status_code = 400
         return response
 
-    gen_token = get_confirm_email_token()
+    gen_token = get_confirm_email_token(sent_data['email'])
     origin_url = request.headers.get('Origin') or ''
     confirm_link = '{}/auth/confirm-password/{}'.format(
         origin_url, gen_token)
@@ -91,9 +91,10 @@ def register():
         })
         message = '''You have been successfully registered,
                     Please confirm email address'''
-    email = render_template('emails/reset.html',
+    email = render_template('emails/confirm-password.html',
                             name=sent_data['username'], url=confirm_link)
-    send_mail(sent_data['email'], email)
+    send_mail('WeConnect - Confirm your email address',
+              sent_data['email'], email)
     response = jsonify({
         'status': 'ok',
         'message': message
@@ -337,8 +338,8 @@ def reset_link():
     reset_link = '{}/auth/reset-password/{}'.format(origin_url, gen_token)
     email = render_template('emails/reset.html',
                             name=user.username, url=reset_link)
-    send_mail(
-        user.email, email)
+    send_mail('Reset your account password on WeConnect',
+              user.email, email)
     response = jsonify({
         'status': 'ok',
         'message': "Check your email to reset password"
