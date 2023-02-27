@@ -1,4 +1,4 @@
-# WeConnect 
+# WeConnect
 [![Build Status](https://travis-ci.org/muhozi/WeConnect-2.svg?branch=master)](https://travis-ci.org/muhozi/WeConnect-2)
 [![Coverage Status](https://coveralls.io/repos/github/muhozi/WeConnect-2/badge.svg)](https://coveralls.io/github/muhozi/WeConnect-2)
 [![codecov](https://codecov.io/gh/muhozi/WeConnect-2/branch/master/graph/badge.svg)](https://codecov.io/gh/muhozi/WeConnect-2)
@@ -7,6 +7,8 @@
 
 
 WeConnect provides a platform that brings businesses and individuals together. This platform creates awareness for businesses and gives the users the ability to write reviews about the businesses they have interacted with. 
+
+This a Bootcamp project
 
 ## API
 
@@ -71,17 +73,25 @@ Create file name it `.env` and add the following contents:
 
 ```sh
 DEBUG=True
-ENV='development'
-SECRET_KEY='_custom_secret_key'
+ENV=production
+SECRET_KEY='_custom_secret_key_'
 DATABASE_URI='postgresql://db_user:db_pass@db_host:db_port/db_name'
 MAIL_SERVER='smtp.mailhost.net'
 MAIL_PORT=25
 MAIL_USERNAME='mail_username'
 MAIL_PASSWORD='mail_password'
 MAIL_DEFAULT_SENDER='default@mailhost.com'
+PRIVATE_KEY='PRIVATE_KEY'
+PUBLIC_KEY="PUBLIC_KEY"
 ```
 
-To send emails, make sure that you have SMTP server to use. 
+To send emails, make sure that you have SMTP server to use.
+
+**Running Database migrations**
+
+After making sure everthing is set(Virtual environment and necessary environment variables) You can run migrations by running the following command:
+
+```flask db migrate```
 
 ### Run the application
 
@@ -143,23 +153,11 @@ View the API usage (Documentation) in a browser via: http://127.0.0.1:5000/api/v
 
 **`POST /auth/confirm/<token>`** Confirm email
 
-
-
-
-
-
-
-
-
 > The above endpoints may be accessed on Heroku, the base URL is https://allconnect.herokuapp.com
 >
 > Also you may read and try out the detailed usage of the API through its documentation at 
 >
 >  https://allconnect.herokuapp.com/api/v1
-
-
-
-
 
 ## User Interface
 
@@ -169,17 +167,9 @@ WeConnect use the following UI technology:
 
 Check the front app [here](https://connectship.herokuapp.com/)
 
-
-
-## Thank you!
-
-Thank you for checking this out, I would love to hear any feedback from you. Cheers 🎉
-
 ## Author
 
 Emery Muhozi
-
-
 
 ## License
 
