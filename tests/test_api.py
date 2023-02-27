@@ -3,7 +3,7 @@
 '''
 import unittest
 from werkzeug.security import generate_password_hash
-from api import create_app
+from api.index import create_app
 from api.models.user import User
 from api.models.token import Token
 from api.models.business import Business
