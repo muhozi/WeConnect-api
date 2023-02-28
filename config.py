@@ -19,7 +19,7 @@ class Config():
     MAIL_PORT = os.getenv('MAIL_PORT')
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.getenv('noreply@allconnect.herokuapp.com')
+    MAIL_DEFAULT_SENDER = os.getenv('noreply@weconnect.muhozi.dev')
 
 
 class ProductionConfig(Config):

@@ -1,0 +1,41 @@
+name: weconnect-frontend
+on:
+  push:
+    branches: ["develop"]
+  pull_request:
+    branches: ["develop"]
+jobs:
+  deploy-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9.16
+          cache: "pip"
+      - run: pip install -r requirements.txt
+      - name: Run unit tests
+        env:
+          DEBUG: ${{ secrets.DEBUG }}
+          ENV: ${{ secrets.ENV }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DATABASE_URI: ${{ secrets.DATABASE_URI }}
+          MAIL_SERVER: ${{ secrets.MAIL_SERVER }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_DEFAULT_SENDER: ${{ secrets.MAIL_DEFAULT_SENDER }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
+        run: nosetests -v
+      - uses: actions/checkout@v3
+      - name: Deploy 🚀
+        if: success() && github.ref == 'refs/heads/develop'
+        uses: appleboy/ssh-action@develop
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ secrets.PROJECT_DIR }}
+            bash ./deploy.sh

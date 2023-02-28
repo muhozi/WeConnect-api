@@ -16,7 +16,7 @@ This a Bootcamp project
 
 
 
-**TL**;**DR** Check the API docs at https://allconnect.herokuapp.com/api/v1 
+**TL**;**DR** Check the API docs at https://weconnect-api.muhozi.dev/api/v1 
 
 ### Prerequisites
 
@@ -153,11 +153,11 @@ View the API usage (Documentation) in a browser via: http://127.0.0.1:5000/api/v
 
 **`POST /auth/confirm/<token>`** Confirm email
 
-> The above endpoints may be accessed on Heroku, the base URL is https://allconnect.herokuapp.com
+> The above endpoints can be accessed through https://weconnect-api.muhozi.dev
 >
 > Also you may read and try out the detailed usage of the API through its documentation at 
 >
->  https://allconnect.herokuapp.com/api/v1
+>  https://weconnect-api.muhozi.dev/api/v1
 
 ## User Interface
 
@@ -165,7 +165,7 @@ WeConnect use the following UI technology:
 
 - ReactJS / Redux
 
-Check the front app [here](https://connectship.herokuapp.com/)
+Check the front end app [here](https://weconnect.muhozi.dev/)
 
 ## Author
 
